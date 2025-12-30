@@ -1,14 +1,21 @@
 console.log("Health Dashboard 3 is alive 👊");
 
 // =======================
-// In-memory store
+// Load or initialize in-memory store
 // =======================
-const healthData = {
+let healthData = JSON.parse(localStorage.getItem("healthData")) || {
   walks: [],
   treadmill: [],
   strength: [],
   bp: []
 };
+
+// =======================
+// Save to localStorage
+// =======================
+function saveData() {
+  localStorage.setItem("healthData", JSON.stringify(healthData));
+}
 
 // =======================
 // Timestamp helper
@@ -23,18 +30,21 @@ function now() {
 function logWalk(date, durationMinutes, distanceKm = 0, avgHR = null, maxHR = null, calories = 0, speed = 0) {
   const entry = { date, durationMinutes, distanceKm, avgHR, maxHR, calories, speed };
   healthData.walks.push(entry);
+  saveData();
   console.log("Walk logged:", entry);
 }
 
 function logTreadmill(date, durationMinutes, distanceKm = 0, avgHR = null, maxHR = null, calories = 0, speed = 0) {
   const entry = { date, durationMinutes, distanceKm, avgHR, maxHR, calories, speed };
   healthData.treadmill.push(entry);
+  saveData();
   console.log("Treadmill logged:", entry);
 }
 
 function logStrength(date, exercises = []) {
   const entry = { date, exercises };
   healthData.strength.push(entry);
+  saveData();
   console.log("Strength session logged:", entry);
 }
 
@@ -44,6 +54,7 @@ function logStrength(date, exercises = []) {
 function logBP(date, systolic, diastolic, pulse, tag = "") {
   const entry = { date, systolic, diastolic, pulse, tag };
   healthData.bp.push(entry);
+  saveData();
   console.log("BP logged:", entry);
 }
 
@@ -84,7 +95,7 @@ function getDailySummary(date) {
 
   healthData.strength.forEach(s => {
     if (s.date === date) {
-      summary.strengthDuration += s.exercises.reduce((acc, ex) => acc + (ex.sets * ex.reps), 0); // total reps
+      summary.strengthDuration += s.exercises.reduce((acc, ex) => acc + (ex.sets * ex.reps), 0);
       summary.strengthExercises += s.exercises.length;
     }
   });
@@ -126,9 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
     logBP(today, 122, 67, 90, "M Hypertension");
 
-    console.log("Demo data added:", healthData);
-
-    // Auto-update daily summary
     const summary = getDailySummary(today);
     outputDiv.innerHTML = `
       <h3>Daily Summary for ${today}</h3>
@@ -141,4 +149,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-console.log("Health Dashboard 3 ready");
+console.log("Health Dashboard 3 ready with persistence ✅");
