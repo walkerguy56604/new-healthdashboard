@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Health Dashboard 3</title>
-
-  <!-- Styling goes here -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,30 +10,14 @@
       color: #0f172a;
       padding: 20px;
     }
-
-    h1 {
-      <body>
-  <h1>Health Dashboard 3</h1>
-
-  <label for="datePicker">Select Date: </label>
-  <input type="date" id="datePicker" />
-  <div id="dailySummaryOutput"></div>
-
-  <script src="./app.js"></script>
-</body>
+    h1, h2 {
       text-align: center;
     }
-<!-- Scrollable history section -->
-<h2>History</h2>
-<div id="historyList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
-  <!-- Individual history items will be inserted here by JS -->
-</div>
     label, input {
       display: block;
       margin-bottom: 10px;
       font-size: 16px;
     }
-
     #dailySummaryOutput {
       margin-top: 20px;
       padding: 15px;
@@ -43,40 +25,46 @@
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
     #dailySummaryOutput h3 {
       margin-top: 0;
     }
-
     #dailySummaryOutput div {
       margin-bottom: 6px;
+    }
+    #historyList {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 6px;
+    }
+    #historyList button {
+      display: block;
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px;
+      font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>Health Dashboard 3</h1>
 
-  <!-- Daily Summary Container -->
-  <div id="dailySummaryOutput"></div>
-  <!-- Scrollable history -->
-<div id="historyList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
-
-  <!-- Your JavaScript -->
-  <script src="./app.js"></script>
-  <body>
-  <h1>Health Dashboard 3</h1>
-
   <!-- Date picker -->
+  <label for="datePicker">Select Date:</label>
   <input type="date" id="datePicker" />
 
-  <!-- Daily summary -->
+  <!-- Daily Summary -->
   <div id="dailySummaryOutput"></div>
 
-  <!-- Scrollable history -->
-  <div id="historyList" style="max-height: 300px; overflow-y: auto;"></div>
+  <!-- Scrollable History -->
+  <h2>History</h2>
+  <div id="historyList"></div>
 
-  <!-- App JS goes last -->
+  <!-- App JS -->
   <script src="app.js"></script>
-</body>
 </body>
 </html>
