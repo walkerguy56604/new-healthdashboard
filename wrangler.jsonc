@@ -1,1 +1,7 @@
-
+{
+  "name": "health-dashboard-3",        // name must be all lowercase, no spaces
+  "compatibility_date": "2025-12-30", // today's date works fine
+  "assets": {
+    "directory": "./"                  // points to your project folder
+  }
+}
