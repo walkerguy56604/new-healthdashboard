@@ -2,20 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Health Dashboard 3</title>
+
+  <!-- Styling goes here -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      color: #0f172a;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label, input {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    #dailySummaryOutput {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    #dailySummaryOutput h3 {
+      margin-top: 0;
+    }
+
+    #dailySummaryOutput div {
+      margin-bottom: 6px;
+    }
+  </style>
 </head>
 <body>
   <h1>Health Dashboard 3</h1>
 
-  <!-- Date picker -->
-  <label for="datePicker">Select Date:</label>
-  <input type="date" id="datePicker">
-
-  <!-- Output container -->
+  <!-- Daily Summary Container -->
   <div id="dailySummaryOutput"></div>
 
-  <!-- App script -->
-  <script src="app.js"></script>
+  <!-- Your JavaScript -->
+  <script src="./app.js"></script>
 </body>
 </html>
