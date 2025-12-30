@@ -1,3 +1,16 @@
+// Simple on-screen logger for Dashboard 3
+function logMessage(msg) {
+  const logDiv = document.getElementById('log');
+  if (!logDiv) return;
+
+  const p = document.createElement('p');
+  p.textContent = msg;
+  logDiv.appendChild(p);
+}
+
+// Initial test message
+logMessage('Dashboard loaded');
+
 console.log("Dashboard 3 loaded");
 console.log("Health Dashboard 3 - 7-Day Summary with Sparklines 👊");
 
