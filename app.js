@@ -1,111 +1,138 @@
-// Health Dashboard 3 - Core App Skeleton
-// In-memory store for now, can save to JSON/CSV later
+console.log("Health Dashboard 3 is alive 👊");
 
-// Sample Data
+// =======================
+// In-memory store
+// =======================
 const healthData = {
-  date: "2025-12-30",
   walks: [],
   treadmill: [],
   strength: [],
-  bp: []
+  bp: [],
+  calories: [],
+  heartRates: []
 };
 
-// Utility: Log messages to HTML console
-function logMessage(msg) {
-  const logDiv = document.getElementById('log');
-  if (logDiv) {
-    const p = document.createElement('p');
-    p.textContent = msg;
-    logDiv.appendChild(p);
-  } else {
-    console.error('Error: Element with id "log" not found!');
-  }
+// =======================
+// Timestamp helper
+// =======================
+function now() {
+  return new Date().toISOString();
 }
 
-// Update Daily Summary
-function updateDailySummary() {
+// =======================
+// Logging functions
+// =======================
+function logWalk(date, durationMinutes, distanceKm = 0, avgHR = null, maxHR = null, calories = 0, speed = 0) {
+  const entry = { date, durationMinutes, distanceKm, avgHR, maxHR, calories, speed };
+  healthData.walks.push(entry);
+  if (avgHR) healthData.heartRates.push(avgHR);
+  if (calories) healthData.calories.push(calories);
+  console.log("Walk logged:", entry);
+}
+
+function logTreadmill(date, durationMinutes, distanceKm = 0, avgHR = null, maxHR = null, calories = 0, speed = 0) {
+  const entry = { date, durationMinutes, distanceKm, avgHR, maxHR, calories, speed };
+  healthData.treadmill.push(entry);
+  if (avgHR) healthData.heartRates.push(avgHR);
+  if (calories) healthData.calories.push(calories);
+  console.log("Treadmill logged:", entry);
+}
+
+function logStrength(date, exercises = []) {
+  const entry = { date, exercises };
+  healthData.strength.push(entry);
+  console.log("Strength session logged:", entry);
+}
+
+function logBP(date, systolic, diastolic, pulse, category = "") {
+  const entry = { date, systolic, diastolic, pulse, category };
+  healthData.bp.push(entry);
+  if (pulse) healthData.heartRates.push(pulse);
+  console.log("BP logged:", entry);
+}
+
+// =======================
+// Render dashboard
+// =======================
+function renderDashboard(date) {
   const dashboard = document.getElementById('dashboard');
-  if (!dashboard) return;
+  if (!dashboard) return console.warn("No dashboard element found");
+  dashboard.innerHTML = ''; // Clear previous content
 
-  dashboard.innerHTML = `
-    <h2>Daily Summary for ${healthData.date}</h2>
-    <p>Walk Duration: ${sumDuration(healthData.walks)} min (${sumDistance(healthData.walks)} km)</p>
-    <p>Treadmill Duration: ${sumDuration(healthData.treadmill)} min (${sumDistance(healthData.treadmill)} km)</p>
-    <p>Strength Duration: ${sumReps(healthData.strength)} reps (${healthData.strength.length} exercises)</p>
-    <p>Calories Burned: ${sumCalories()}</p>
-    <p>Average Heart Rate: ${avgHeartRate()}</p>
-  `;
+  const summaryTitle = document.createElement('h2');
+  summaryTitle.textContent = `Daily Summary for ${date}`;
+  dashboard.appendChild(summaryTitle);
+
+  // Walks
+  const totalWalkMinutes = healthData.walks
+    .filter(w => w.date === date)
+    .reduce((sum, w) => sum + w.durationMinutes, 0);
+  const totalWalkDistance = healthData.walks
+    .filter(w => w.date === date)
+    .reduce((sum, w) => sum + w.distanceKm, 0);
+  const walkDiv = document.createElement('div');
+  walkDiv.textContent = `Walk Duration: ${totalWalkMinutes} min (${totalWalkDistance.toFixed(2)} km)`;
+  dashboard.appendChild(walkDiv);
+
+  // Treadmill
+  const totalTreadmillMinutes = healthData.treadmill
+    .filter(t => t.date === date)
+    .reduce((sum, t) => sum + t.durationMinutes, 0);
+  const totalTreadmillDistance = healthData.treadmill
+    .filter(t => t.date === date)
+    .reduce((sum, t) => sum + t.distanceKm, 0);
+  const treadmillDiv = document.createElement('div');
+  treadmillDiv.textContent = `Treadmill Duration: ${totalTreadmillMinutes} min (${totalTreadmillDistance.toFixed(2)} km)`;
+  dashboard.appendChild(treadmillDiv);
+
+  // Strength
+  const totalReps = healthData.strength
+    .filter(s => s.date === date)
+    .reduce((sum, s) => sum + s.exercises.reduce((acc, ex) => acc + (ex.sets * ex.reps), 0), 0);
+  const totalExercises = healthData.strength
+    .filter(s => s.date === date)
+    .reduce((sum, s) => sum + s.exercises.length, 0);
+  const strengthDiv = document.createElement('div');
+  strengthDiv.textContent = `Strength Duration: ${totalReps} reps (${totalExercises} exercises)`;
+  dashboard.appendChild(strengthDiv);
+
+  // Calories
+  const totalCalories = healthData.calories.reduce((sum, c) => sum + c, 0);
+  const caloriesDiv = document.createElement('div');
+  caloriesDiv.textContent = `Calories Burned: ${totalCalories}`;
+  dashboard.appendChild(caloriesDiv);
+
+  // Average Heart Rate
+  const avgHeartRate = healthData.heartRates.length
+    ? Math.round(healthData.heartRates.reduce((sum, h) => sum + h, 0) / healthData.heartRates.length)
+    : 'N/A';
+  const hrDiv = document.createElement('div');
+  hrDiv.textContent = `Average Heart Rate: ${avgHeartRate}`;
+  dashboard.appendChild(hrDiv);
+
+  // Blood pressure readings
+  healthData.bp
+    .filter(bp => bp.date === date)
+    .forEach((bpEntry, i) => {
+      const bpDiv = document.createElement('div');
+      bpDiv.textContent = `BP ${i + 1}: ${bpEntry.systolic}/${bpEntry.diastolic}/${bpEntry.pulse} ${bpEntry.category}`;
+      dashboard.appendChild(bpDiv);
+    });
 }
 
-// Summaries
-function sumDuration(arr) {
-  return arr.reduce((a,b) => a + (b.duration || 0), 0);
-}
-function sumDistance(arr) {
-  return arr.reduce((a,b) => a + (b.distance || 0), 0).toFixed(2);
-}
-function sumReps(arr) {
-  return arr.reduce((a,b) => a + (b.reps || 0), 0);
-}
-function sumCalories() {
-  return sumDuration(healthData.walks) + sumDuration(healthData.treadmill) + sumReps(healthData.strength);
-}
-function avgHeartRate() {
-  const allHR = [...healthData.walks, ...healthData.treadmill, ...healthData.strength]
-                  .map(e => e.avgHR).filter(Boolean);
-  if (allHR.length === 0) return "N/A";
-  return Math.round(allHR.reduce((a,b)=>a+b,0)/allHR.length);
-}
+// =======================
+// Example usage
+// =======================
+const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+logWalk(today, 5, 0.2, 107, 117, 12, 1.4);
+logTreadmill(today, 10, 0.24, 115, 154, 11, 1.4);
+logStrength(today, [
+  { name: "biceps", sets: 3, reps: 10 },
+  { name: "laterals", sets: 3, reps: 10 }
+]);
+logBP(today, 128, 65, 92, "M Hypertension");
 
-// Add sample BP reading
-function addBP(systolic, diastolic, hr, type) {
-  healthData.bp.push({ systolic, diastolic, hr, type, time: new Date() });
-  logMessage(`BP Added: ${systolic}/${diastolic}/${hr} ${type}`);
-}
-
-// Example: Add a walk
-function addWalk(duration, distance, calories, avgHR, maxHR) {
-  healthData.walks.push({ duration, distance, calories, avgHR, maxHR, time: new Date() });
-  logMessage(`Walk Added: ${duration}min, ${distance}km, ${calories}cal`);
-}
-
-// Example: Add treadmill
-function addTreadmill(duration, distance, speed, calories, avgHR, maxHR) {
-  healthData.treadmill.push({ duration, distance, speed, calories, avgHR, maxHR, time: new Date() });
-  logMessage(`Treadmill Added: ${duration}min, ${distance}km, ${calories}cal`);
-}
-
-// Example: Add strength
-function addStrength(exercise, reps, sets, calories, avgHR, maxHR) {
-  healthData.strength.push({ exercise, reps, sets, calories, avgHR, maxHR, time: new Date() });
-  logMessage(`Strength Added: ${exercise} ${reps}x${sets}`);
-}
-
-// Iframe Section - Add your platform URLs
-function addPlatformIframe(title, url) {
-  const platformsDiv = document.getElementById('platforms');
-  if (!platformsDiv) return;
-
-  const iframe = document.createElement('iframe');
-  iframe.src = url;
-  iframe.title = title;
-  iframe.width = "100%";
-  iframe.height = "400";
-  iframe.style.border = "1px solid #ccc";
-  platformsDiv.appendChild(iframe);
-
-  logMessage(`Iframe added: ${title}`);
-}
-
-// Initialize Dashboard
-function initDashboard() {
-  logMessage("Dashboard loaded");
-  updateDailySummary();
-
-  // Example iframes (you can replace URLs)
-  addPlatformIframe("Cloudflare", "https://dash.cloudflare.com/");
-  addPlatformIframe("Netlify", "https://app.netlify.com/");
-  addPlatformIframe("Codesandbox", "https://codesandbox.io/dashboard");
-}
-
-window.addEventListener('DOMContentLoaded', initDashboard);
+// Render when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  renderDashboard(today);
+});
