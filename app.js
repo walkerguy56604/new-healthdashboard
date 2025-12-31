@@ -81,3 +81,66 @@ datePicker.addEventListener('change', (e) => {
     historyList.prepend(btn); // newest on top
   }
 });
+// =======================
+// CSV Export
+// =======================
+function convertDailyLogToCSV(date) {
+  const summary = dailyLogs[date];
+  if (!summary) return null;
+
+  let csv = "Type,Value,Time,Note\n";
+
+  // Blood Pressure
+  summary.bloodPressure.forEach((bp, idx) => {
+    csv += `BP,${bp.systolic}/${bp.diastolic},${bp.heartRate || ""},${bp.note || ""}\n`;
+  });
+
+  // Glucose
+  summary.glucose.forEach((g, idx) => {
+    if (typeof g === "object") {
+      csv += `Glucose,${g.value},${g.time || ""},${g.note || ""}\n`;
+    } else {
+      csv += `Glucose,${g},,,\n`;
+    }
+  });
+
+  return csv;
+}
+
+function downloadCSV(csv, date) {
+  if (!csv) return;
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `HealthDashboard_${date}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Add export button dynamically
+function addExportButton(date) {
+  const dailySummaryOutput = document.getElementById('dailySummaryOutput');
+  let existingBtn = document.getElementById("exportCSVButton");
+  if (existingBtn) existingBtn.remove();
+
+  const btn = document.createElement("button");
+  btn.id = "exportCSVButton";
+  btn.textContent = "Export CSV for Doctors";
+  btn.style.marginTop = "10px";
+  btn.addEventListener("click", () => {
+    const csv = convertDailyLogToCSV(date);
+    if (csv) downloadCSV(csv, date);
+    else alert("No data to export for this date.");
+  });
+
+  dailySummaryOutput.appendChild(btn);
+}
+
+// Hook export button whenever a date is selected
+datePicker.addEventListener("change", (e) => {
+  const selectedDate = e.target.value;
+  addExportButton(selectedDate);
+});
