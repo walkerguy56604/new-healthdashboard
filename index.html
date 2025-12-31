@@ -57,46 +57,12 @@
     <canvas id="trendChart"></canvas>
   </div>
 
-  <!-- Export & Apple Health -->
-  <div id="exportContainer">
-    <button id="exportCSVBtn">Export CSV</button>
-    <input type="file" id="appleHealthImport" accept=".json">
-  </div>
+  <!-- Export Buttons & Apple Health Import -->
+  <div id="exportContainer"></div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="./data/dailyLogs.js"></script>
   <script type="module" src="app.js"></script>
-
-  <script>
-    // CSV Export Button (delegated to App.js function)
-    document.getElementById("exportCSVBtn").addEventListener("click", () => {
-      const picker = document.getElementById("datePicker");
-      if(!picker.value){ alert("Please select a date first."); return; }
-      if(typeof exportSelectedCSV === "function"){
-        exportSelectedCSV(picker.value);
-      }
-    });
-
-    // Apple Health Import
-    document.getElementById("appleHealthImport").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const jsonData = JSON.parse(event.target.result);
-          if(typeof mapAppleHealthData === "function"){
-            mapAppleHealthData(jsonData);
-            alert("Apple Health data imported!");
-          } else {
-            alert("Apple Health import function not defined in App.js");
-          }
-        } catch(err) {
-          alert("Error parsing JSON: " + err.message);
-        }
-      };
-      reader.readAsText(file);
-    });
-  </script>
 </body>
 </html>
