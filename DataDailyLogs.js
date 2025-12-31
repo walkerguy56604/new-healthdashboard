@@ -361,3 +361,66 @@ export const dailyLogs = {
   calories: 0,
   heartRate: 0
 },
+// =======================
+// January 2025
+// =======================
+"2025-01-01": {
+  bloodPressure: [{ systolic: 108, diastolic: 60, heartRate: 77, note: "IHB" }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-01-02": {
+  bloodPressure: [],
+  glucose: [{ value: 5.6 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-01-03": {
+  bloodPressure: [
+    { systolic: 123, diastolic: 65, heartRate: 87 },
+    { systolic: 110, diastolic: 63, heartRate: 87 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-01-04": {
+  bloodPressure: [],
+  glucose: [{ value: 6.8 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-01-05": {
+  bloodPressure: [{ systolic: 111, diastolic: 61, heartRate: 78 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-01-06": {
+  bloodPressure: [
+    { systolic: 106, diastolic: 59, heartRate: 80 },
+    { systolic: 127, diastolic: 71, heartRate: 79 }
+  ],
+  glucose: [{ value: 6.1 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
