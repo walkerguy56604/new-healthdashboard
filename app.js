@@ -120,8 +120,9 @@ function renderDailySummary(date) {
 const picker = document.getElementById("datePicker");
 const history = document.getElementById("historyList");
 
+// Auto-create today button
 function createTodayButton() {
-  const today = Object.keys(dailyLogs).sort().pop(); // always use latest
+  const today = Object.keys(dailyLogs).sort().pop();
   if (![...history.children].some(b => b.dataset.date === today)) {
     const btn = document.createElement("button");
     btn.textContent = today;
@@ -223,19 +224,14 @@ exportContainer.appendChild(exportCSVBtn);
 function exportSelectedCSV(date){
   const day = dailyLogs[date];
   const rows = [];
-
   rows.push(['Type','Systolic','Diastolic','Heart Rate','Note','Glucose','Time','Walk','Treadmill','Strength','Calories','Avg HR']);
-
   day.bloodPressure.forEach(bp=>{
     rows.push(['BP', bp.systolic, bp.diastolic, bp.heartRate, bp.note||'', '', '', '', '', '', '', '']);
   });
-
   day.glucose.forEach(g=>{
     rows.push(['Glucose', '', '', '', '', g.value, g.time||'', '', '', '', '', '']);
   });
-
   rows.push(['Activity','','','','','', '', day.walk, day.treadmill, day.strength, day.calories, day.heartRate]);
-
   const csvContent = rows.map(r=>r.map(cell=>`"${cell}"`).join(',')).join('\n');
   const blob = new Blob([csvContent], {type: "text/csv"});
   const link = document.createElement("a");
