@@ -4,6 +4,11 @@
 import { dailyLogs } from './data/dailyLogs.js';
 
 // =======================
+// Update Today's Entries
+// =======================
+dailyLogs["2025-12-31"].bloodPressure.push({ systolic: 137, diastolic: 72, heartRate: 86 }); // latest post-strength
+
+// =======================
 // Baseline
 // =======================
 const baselineDate = "2024-10-29";
@@ -22,7 +27,7 @@ function getBPColor(cat) {
 }
 
 // =======================
-// Helper: Last N Dates
+// Last N Dates Helper
 // =======================
 function getLastNDates(endDate, n) {
   const allDates = Object.keys(dailyLogs).sort();
@@ -71,7 +76,7 @@ function renderDailySummary(date) {
 
   let html = `<h3>${date}</h3>`;
 
-  // BP
+  // Blood Pressure
   html += `<h4>Blood Pressure</h4>`;
   d.bloodPressure.length
     ? d.bloodPressure.forEach((bp,i)=>{
@@ -96,7 +101,7 @@ function renderDailySummary(date) {
     <div>Avg HR: ${d.heartRate}</div>
   `;
 
-  // 7-day rolling
+  // 7-day rolling averages
   const r = get7DayRolling(date);
   if(r){
     html += `
@@ -115,14 +120,13 @@ function renderDailySummary(date) {
 }
 
 // =======================
-// History + Date Picker
+// History Buttons & Date Picker
 // =======================
 const picker = document.getElementById("datePicker");
 const history = document.getElementById("historyList");
 
-// Auto-create today button
 function createTodayButton() {
-  const today = Object.keys(dailyLogs).sort().pop(); // always take last date
+  const today = "2025-12-31";
   if (![...history.children].some(b => b.dataset.date === today)) {
     const btn = document.createElement("button");
     btn.textContent = today;
@@ -187,18 +191,14 @@ function renderBPTrends(endDate, days=7){
 // =======================
 // Export Buttons
 // =======================
-const exportCSVBtn = document.getElementById("exportCSVBtn");
-exportCSVBtn.addEventListener("click", ()=>{
-  const selectedDate = picker.value;
-  if(!selectedDate || !dailyLogs[selectedDate]){
-    alert('No data for the selected date!');
-    return;
-  }
-  exportSelectedCSV(selectedDate);
-});
+const exportContainer = document.createElement('div');
+exportContainer.style.marginTop = '15px';
+document.body.insertBefore(exportContainer, document.getElementById('trendContainer'));
 
-const exportJSONBtn = document.getElementById("exportJSONBtn");
-exportJSONBtn.addEventListener("click", ()=>{
+// JSON Export
+const exportJSONBtn = document.createElement('button');
+exportJSONBtn.textContent = 'Export All JSON';
+exportJSONBtn.onclick = () => {
   const blob = new Blob([JSON.stringify(dailyLogs,null,2)], {type: "application/json"});
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
@@ -206,7 +206,21 @@ exportJSONBtn.addEventListener("click", ()=>{
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-});
+};
+exportContainer.appendChild(exportJSONBtn);
+
+// CSV Export for Selected Date
+const exportCSVBtn = document.createElement('button');
+exportCSVBtn.textContent = 'Export Selected Date CSV';
+exportCSVBtn.onclick = () => {
+  const selectedDate = picker.value;
+  if(!selectedDate || !dailyLogs[selectedDate]){
+    alert('No data for the selected date!');
+    return;
+  }
+  exportSelectedCSV(selectedDate);
+};
+exportContainer.appendChild(exportCSVBtn);
 
 // =======================
 // CSV Export Function
