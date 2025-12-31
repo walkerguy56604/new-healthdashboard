@@ -246,3 +246,46 @@ function mapAppleHealthData(appleData) {
     }
   });
 }
+// =======================
+// One-Click Testing Checklist
+// =======================
+function createChecklist() {
+  const checklistContainer = document.createElement('div');
+  checklistContainer.style.marginTop = '20px';
+  checklistContainer.style.padding = '10px';
+  checklistContainer.style.border = '2px solid #333';
+  checklistContainer.style.backgroundColor = '#f9f9f9';
+
+  const title = document.createElement('h3');
+  title.textContent = "🚀 Health Dashboard Quick Checklist";
+  checklistContainer.appendChild(title);
+
+  const steps = [
+    "1️⃣ Log into GitHub, Netlify, and Cloudflare.",
+    "2️⃣ Confirm Netlify project URL & function folder.",
+    "3️⃣ Test Netlify function endpoints.",
+    "4️⃣ Verify Cloudflare Worker is deployed & accessible.",
+    "5️⃣ Render daily summary for a selected date.",
+    "6️⃣ Check 7-day rolling averages & BP trend chart.",
+    "7️⃣ Export CSV & JSON for selected date.",
+    "8️⃣ Test API calls (if configured).",
+    "9️⃣ Verify cross-platform display (iPad/Desktop/PWA).",
+    "🔟 Note any console errors & observations."
+  ];
+
+  const ul = document.createElement('ul');
+  steps.forEach(step => {
+    const li = document.createElement('li');
+    li.textContent = step;
+    li.style.marginBottom = '5px';
+    li.style.cursor = 'pointer';
+    li.onclick = () => li.style.textDecoration = "line-through"; // click to check off
+    ul.appendChild(li);
+  });
+
+  checklistContainer.appendChild(ul);
+  document.body.insertBefore(checklistContainer, document.body.firstChild);
+}
+
+// Auto-create checklist on load
+createChecklist();
