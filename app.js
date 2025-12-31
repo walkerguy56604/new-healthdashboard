@@ -176,7 +176,6 @@ function renderBPTrends(endDate, days=7){
   const labels=[];
   const datasets=[];
 
-  // Prepare datasets: one per BP reading per day
   lastDays.forEach(date=>{
     const day=dailyLogs[date] || { bloodPressure: [] };
     day.bloodPressure.forEach((bp,i)=>{
@@ -185,7 +184,6 @@ function renderBPTrends(endDate, days=7){
       const cat=getBPCategory(bp.systolic,bp.diastolic);
       datasets[i].pointBackgroundColor.push(getBPColor(cat));
     });
-    // Fill null for missing readings
     for(let j=day.bloodPressure.length;j<datasets.length;j++){
       datasets[j].data.push({x:date,y:null});
       datasets[j].pointBackgroundColor.push('gray');
@@ -206,4 +204,30 @@ function renderBPTrends(endDate, days=7){
       }
     }
   });
+}
+
+// =======================
+// CSV Export
+// =======================
+function exportCSV() {
+  let csv = "Date,Walk,Treadmill,Strength,Calories,AvgHR,BP Readings,Glucose\n";
+  Object.keys(dailyLogs).sort().forEach(date=>{
+    const d = dailyLogs[date];
+    const bp = d.bloodPressure.map(b=>`${b.systolic}/${b.diastolic}/${b.heartRate}`).join(" | ");
+    const glucose = d.glucose.map(g=>g.value ?? g).join(" | ");
+    csv += `${date},${d.walk},${d.treadmill},${d.strength},${d.calories},${d.heartRate},"${bp}","${glucose}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `health_data_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+// =======================
+// Apple Health Mapping (Placeholder for mapping logic)
+// =======================
+function mapAppleHealthData() {
+  alert("Apple Health mapping not yet implemented, placeholder only!");
 }
