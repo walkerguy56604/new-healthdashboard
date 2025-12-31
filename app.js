@@ -237,3 +237,76 @@ picker.addEventListener("change", e => {
     history.prepend(btn);
   }
 });
+// =======================
+// Blood Pressure Trends Chart
+// =======================
+let bpChart = null;
+
+function renderBPTrends(endDate, days = 7) {
+  const lastDays = getLastNDates(endDate, days);
+
+  const labels = [];
+  const systolicData = [];
+  const diastolicData = [];
+  const colors = [];
+
+  lastDays.forEach(date => {
+    labels.push(date);
+    const day = dailyLogs[date] || { bloodPressure: [] };
+    
+    if (day.bloodPressure.length > 0) {
+      // Use first BP of the day for trend
+      const bp = day.bloodPressure[0];
+      systolicData.push(bp.systolic);
+      diastolicData.push(bp.diastolic);
+      const cat = getBPCategory(bp.systolic, bp.diastolic);
+      colors.push(getBPColor(cat));
+    } else {
+      systolicData.push(null);
+      diastolicData.push(null);
+      colors.push('gray');
+    }
+  });
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+
+  if (bpChart) bpChart.destroy();
+
+  bpChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Systolic',
+          data: systolicData,
+          borderColor: 'red',
+          backgroundColor: 'rgba(255,0,0,0.2)',
+          tension: 0.3,
+          pointBackgroundColor: colors
+        },
+        {
+          label: 'Diastolic',
+          data: diastolicData,
+          borderColor: 'blue',
+          backgroundColor: 'rgba(0,0,255,0.2)',
+          tension: 0.3,
+          pointBackgroundColor: colors
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        y: { beginAtZero: false, suggestedMin: 50, suggestedMax: 160 }
+      }
+    }
+  });
+}
+
+// Auto-render BP trend when date is selected
+picker.addEventListener("change", e => {
+  const date = e.target.value;
+  renderBPTrends(date, 7);
+});
