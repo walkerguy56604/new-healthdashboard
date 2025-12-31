@@ -87,3 +87,277 @@ export const dailyLogs = {
     heartRate: 141  // avg HR from treadmill
   }
 };
+// In data/dailyLogs.js
+export const dailyLogs = {
+  // existing entries...
+  "2024-12-02": {
+    bloodPressure: [
+      { systolic: 109, diastolic: 58, heartRate: 80 },
+      { systolic: 112, diastolic: 54, heartRate: 80 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-04": {
+    bloodPressure: [{ systolic: 103, diastolic: 57, heartRate: 77 }],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-05": {
+    bloodPressure: [],
+    glucose: [{ value: 6.2 }],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-06": {
+    bloodPressure: [
+      { systolic: 110, diastolic: 59, heartRate: 78 },
+      { systolic: 114, diastolic: 58, heartRate: 77 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-07": {
+    bloodPressure: [],
+    glucose: [{ value: 6.9 }],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-08": {
+    bloodPressure: [{ systolic: 108, diastolic: 66, heartRate: 88 }],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-09": {
+    bloodPressure: [
+      { systolic: 111, diastolic: 62, heartRate: 79 },
+      { systolic: 124, diastolic: 58, heartRate: 77 }
+    ],
+    glucose: [{ value: 6.9 }],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-10": {
+    bloodPressure: [],
+    glucose: [{ value: 4.2 }],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  "2024-12-12": {
+    bloodPressure: [{ systolic: 108, diastolic: 60, heartRate: 74, note: "IHB" }],
+    glucose: [{ value: 5.1 }],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+  // continue adding more December entries here...
+};// =======================
+// December 2024
+// =======================
+"2024-12-13": {
+  bloodPressure: [
+    { systolic: 108, diastolic: 62, heartRate: 84 },
+    { systolic: 115, diastolic: 61, heartRate: 83 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-14": {
+  bloodPressure: [],
+  glucose: [{ value: 6.4 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-15": {
+  bloodPressure: [{ systolic: 103, diastolic: 62, heartRate: 75 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-16": {
+  bloodPressure: [
+    { systolic: 111, diastolic: 62, heartRate: 77 },
+    { systolic: 112, diastolic: 59, heartRate: 75 }
+  ],
+  glucose: [{ value: 6.6 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-18": {
+  bloodPressure: [{ systolic: 124, diastolic: 75, heartRate: 96 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-19": {
+  bloodPressure: [],
+  glucose: [{ value: 5.1 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-20": {
+  bloodPressure: [
+    { systolic: 110, diastolic: 60, heartRate: 85 },
+    { systolic: 111, diastolic: 57, heartRate: 84 }
+  ],
+  glucose: [{ value: 5.4 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-21": {
+  bloodPressure: [],
+  glucose: [{ value: 7.2 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-22": {
+  bloodPressure: [{ systolic: 110, diastolic: 73, heartRate: 99 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-23": {
+  bloodPressure: [],
+  glucose: [{ value: 5.4 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-24": {
+  bloodPressure: [{ systolic: 135, diastolic: 76, heartRate: 93 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-25": {
+  bloodPressure: [],
+  glucose: [{ value: 8.1 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-26": {
+  bloodPressure: [],
+  glucose: [{ value: 9.6 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-27": {
+  bloodPressure: [
+    { systolic: 126, diastolic: 82, heartRate: 95 },
+    { systolic: 134, diastolic: 77, heartRate: 98 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-28": {
+  bloodPressure: [],
+  glucose: [{ value: 8.8 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-29": {
+  bloodPressure: [{ systolic: 115, diastolic: 61, heartRate: 87 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-30": {
+  bloodPressure: [
+    { systolic: 112, diastolic: 60, heartRate: 77 },
+    { systolic: 108, diastolic: 60, heartRate: 75 }
+  ],
+  glucose: [{ value: 7.7 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2024-12-31": {
+  bloodPressure: [],
+  glucose: [{ value: 7.5 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
