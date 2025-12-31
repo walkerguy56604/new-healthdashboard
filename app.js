@@ -289,3 +289,20 @@ function createChecklist() {
 
 // Auto-create checklist on load
 createChecklist();
+// =======================
+// Today's entry
+// =======================
+dailyLogs["2025-12-31"] = {
+  bloodPressure: [
+    { systolic: 130, diastolic: 69, heartRate: 80, note: "M" },
+    { systolic: 121, diastolic: 67, heartRate: 80, note: "M" }
+  ],
+  glucose: [
+    { value: 5.4 }
+  ],
+  walk: 5,        // your early walk
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 80
+};
