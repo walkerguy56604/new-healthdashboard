@@ -57,12 +57,89 @@
     <canvas id="trendChart"></canvas>
   </div>
 
-  <!-- Export Buttons & Apple Health Import -->
+  <!-- Export & Apple Health -->
   <div id="exportContainer"></div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="./data/dailyLogs.js"></script>
   <script type="module" src="app.js"></script>
+
+  <script type="module">
+    import { renderDailySummary, renderBPTrends, exportSelectedCSV } from './app.js';
+
+    const picker = document.getElementById("datePicker");
+    const history = document.getElementById("historyList");
+
+    // Create "today" button for latest entry
+    function createTodayButton() {
+      const today = "2025-12-31";
+      if (![...history.children].some(b => b.dataset.date === today)) {
+        const btn = document.createElement("button");
+        btn.textContent = today;
+        btn.dataset.date = today;
+        btn.onclick = () => { renderDailySummary(today); renderBPTrends(today,7); };
+        history.prepend(btn);
+      }
+    }
+    createTodayButton();
+
+    // Date picker change
+    picker.addEventListener("change", e=>{
+      const date = e.target.value;
+      renderDailySummary(date);
+      renderBPTrends(date,7);
+      if(![...history.children].some(b=>b.dataset.date===date)){
+        const btn=document.createElement("button");
+        btn.textContent=date;
+        btn.dataset.date=date;
+        btn.onclick=()=>{ renderDailySummary(date); renderBPTrends(date,7); };
+        history.prepend(btn);
+      }
+    });
+
+    // Export CSV Button
+    const exportCSVBtn = document.createElement('button');
+    exportCSVBtn.textContent = 'Export Selected Date CSV';
+    exportCSVBtn.onclick = () => {
+      const selectedDate = picker.value;
+      if(!selectedDate){ alert("Please select a date first."); return; }
+      exportSelectedCSV(selectedDate);
+    };
+    document.getElementById("exportContainer").appendChild(exportCSVBtn);
+
+    // Export JSON Button
+    const exportJSONBtn = document.createElement('button');
+    exportJSONBtn.textContent = 'Export All JSON';
+    exportJSONBtn.onclick = () => {
+      // handled inside App.js (already wired)
+      alert("Use JSON export in App.js buttons section.");
+    };
+    document.getElementById("exportContainer").appendChild(exportJSONBtn);
+
+    // Apple Health Import (delegates to App.js mapAppleHealthData)
+    const appleInput = document.createElement('input');
+    appleInput.type = 'file';
+    appleInput.accept = '.json';
+    appleInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const jsonData = JSON.parse(event.target.result);
+          if(typeof window.mapAppleHealthData === "function"){
+            window.mapAppleHealthData(jsonData);
+            alert("Apple Health data imported!");
+          } else {
+            alert("mapAppleHealthData function not defined in App.js");
+          }
+        } catch(err) {
+          alert("Error parsing JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    document.getElementById("exportContainer").appendChild(appleInput);
+  </script>
 </body>
 </html>
