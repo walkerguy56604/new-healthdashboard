@@ -1,23 +1,117 @@
 // =======================
-// Daily Logs Data
+// Baseline for comparison (October 29, 2024)
+// =======================
+const baselineDate = "2024-10-29";
+
+// =======================
+// Daily Logs Data (Historical Preload)
 // =======================
 const dailyLogs = {
-  "2025-12-30": {
+  "2024-10-29": {
     bloodPressure: [
-      { systolic: 131, diastolic: 74, heartRate: 95, note: "Post strength training", category: "H" }
+      { systolic: 108, diastolic: 62, heartRate: 69, note: "IHB" },
+      { systolic: 118, diastolic: 59, heartRate: 72, note: "IHB" }
     ],
     glucose: [],
-    walk: 40,
-    treadmill: 10,
+    walk: 0,
+    treadmill: 0,
     strength: 30,
-    calories: 22,
-    heartRate: 100
+    calories: 0,
+    heartRate: "N/A"
   },
-  // Add more days here...
+  "2024-11-01": {
+    bloodPressure: [
+      { systolic: 114, diastolic: 65, heartRate: 77 },
+      { systolic: 112, diastolic: 59, heartRate: 75 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-04": {
+    bloodPressure: [
+      { systolic: 111, diastolic: 58, heartRate: 78 },
+      { systolic: 122, diastolic: 68, heartRate: 76 }
+    ],
+    glucose: [6.7],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-07": {
+    bloodPressure: [],
+    glucose: [5.1],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-08": {
+    bloodPressure: [
+      { systolic: 112, diastolic: 61, heartRate: 77 },
+      { systolic: 119, diastolic: 71, heartRate: 74 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-11": {
+    bloodPressure: [
+      { systolic: 117, diastolic: 58, heartRate: 76 },
+      { systolic: 132, diastolic: 69, heartRate: 76 }
+    ],
+    glucose: [6.0],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-12": {
+    bloodPressure: [],
+    glucose: [6.1],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-15": {
+    bloodPressure: [
+      { systolic: 118, diastolic: 69, heartRate: 83 },
+      { systolic: 120, diastolic: 66, heartRate: 82 }
+    ],
+    glucose: [
+      { value: 7.7, time: "05:00" },
+      { value: 4.6, time: "06:30" }
+    ],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  },
+  "2024-11-16": {
+    bloodPressure: [
+      { systolic: 0, diastolic: 0, heartRate: 63 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 30,
+    calories: 0,
+    heartRate: "N/A"
+  }
 };
-
-// Baseline for comparison (October 29, 2024)
-const baselineDate = "2024-10-29";
 
 // =======================
 // Helper Functions
@@ -30,7 +124,7 @@ function getBPCategory(systolic, diastolic) {
   return "L";
 }
 
-// BP color for category
+// Get color for BP category
 function getBPColor(category) {
   switch(category) {
     case "H": return "red";
@@ -40,27 +134,24 @@ function getBPColor(category) {
   }
 }
 
-// =======================
-// Render Daily Summary
-// =======================
+// Render daily summary
 function renderDailySummary(date) {
   const dailySummaryOutput = document.getElementById('dailySummaryOutput');
-  const summary = dailyLogs[date] || { bloodPressure: [], glucose: [], walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 'N/A' };
-  const baseline = dailyLogs[baselineDate] || { bloodPressure: [], glucose: [], walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 'N/A' };
+  const summary = dailyLogs[date] || { bloodPressure: [], glucose: [], walk:0, treadmill:0, strength:0, calories:0, heartRate:"N/A" };
+  const baseline = dailyLogs[baselineDate] || { bloodPressure: [], glucose: [] };
 
   let html = `<h3>Daily Summary for ${date}</h3>`;
 
-  // Blood Pressure
+  // Blood Pressure Section
   if (summary.bloodPressure.length > 0) {
     html += `<h4>Blood Pressure</h4>`;
     summary.bloodPressure.forEach((bp, idx) => {
       const category = getBPCategory(bp.systolic, bp.diastolic);
       html += `<div style="color:${getBPColor(category)}">
-        BP #${idx + 1}: ${bp.systolic}/${bp.diastolic} mmHg, HR: ${bp.heartRate} ${bp.note ? "(" + bp.note + ")" : ""} - ${category} hypertension
+        BP #${idx + 1}: ${bp.systolic}/${bp.diastolic} mmHg, HR: ${bp.heartRate || "N/A"} ${bp.note ? "(" + bp.note + ")" : ""} - ${category} hypertension
       </div>`;
     });
-
-    // Compare to baseline
+    // Compare to baseline first BP
     if (baseline.bloodPressure.length > 0) {
       const baseBP = baseline.bloodPressure[0];
       html += `<div style="margin-top:5px; font-style:italic; color:blue;">
@@ -71,7 +162,7 @@ function renderDailySummary(date) {
     html += `<div>No blood pressure readings</div>`;
   }
 
-  // Glucose
+  // Glucose Section
   if (summary.glucose.length > 0) {
     html += `<h4>Glucose</h4>`;
     summary.glucose.forEach((g, idx) => {
@@ -85,22 +176,21 @@ function renderDailySummary(date) {
     html += `<div>No glucose readings</div>`;
   }
 
-  // Activity Metrics
-  html += `<h4>Activity Metrics</h4>`;
-  html += `<div>Walk Duration: ${summary.walk} min</div>`;
-  html += `<div>Treadmill Duration: ${summary.treadmill} min</div>`;
-  html += `<div>Strength Duration: ${summary.strength} reps</div>`;
-  html += `<div>Calories Burned: ${summary.calories}</div>`;
-  html += `<div>Average Heart Rate: ${summary.heartRate}</div>`;
+  // Activity Section
+  html += `<h4>Activity</h4>
+    <div>Walk Duration: ${summary.walk} min</div>
+    <div>Treadmill Duration: ${summary.treadmill} min</div>
+    <div>Strength: ${summary.strength} reps</div>
+    <div>Calories: ${summary.calories}</div>
+    <div>Average Heart Rate: ${summary.heartRate}</div>
+  `;
 
   dailySummaryOutput.innerHTML = html;
-
-  // Add Export CSV Button
   addExportButton(date);
 }
 
 // =======================
-// History Buttons
+// History Buttons & Date Picker
 // =======================
 const historyList = document.getElementById('historyList');
 const datePicker = document.getElementById('datePicker');
@@ -109,6 +199,7 @@ datePicker.addEventListener('change', (e) => {
   const selectedDate = e.target.value;
   renderDailySummary(selectedDate);
 
+  // Add button if doesn't exist
   if (![...historyList.children].some(btn => btn.dataset.date === selectedDate)) {
     const btn = document.createElement('button');
     btn.textContent = selectedDate;
@@ -127,26 +218,14 @@ function convertDailyLogToCSV(date) {
 
   let csv = "Type,Value,Time,Note\n";
 
-  // Blood Pressure
-  summary.bloodPressure.forEach((bp, idx) => {
+  summary.bloodPressure.forEach(bp => {
     csv += `BP,${bp.systolic}/${bp.diastolic},${bp.heartRate || ""},${bp.note || ""}\n`;
   });
 
-  // Glucose
-  summary.glucose.forEach((g, idx) => {
-    if (typeof g === "object") {
-      csv += `Glucose,${g.value},${g.time || ""},${g.note || ""}\n`;
-    } else {
-      csv += `Glucose,${g},,,\n`;
-    }
+  summary.glucose.forEach(g => {
+    if (typeof g === "object") csv += `Glucose,${g.value},${g.time || ""},\n`;
+    else csv += `Glucose,${g},,,\n`;
   });
-
-  // Activity Metrics
-  csv += `Walk,${summary.walk},,\n`;
-  csv += `Treadmill,${summary.treadmill},,\n`;
-  csv += `Strength,${summary.strength},,\n`;
-  csv += `Calories,${summary.calories},,\n`;
-  csv += `Heart Rate,${summary.heartRate},,\n`;
 
   return csv;
 }
