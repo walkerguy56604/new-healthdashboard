@@ -2,6 +2,37 @@
 // Import Daily Logs
 // =======================
 import { dailyLogs } from './data/dailyLogs.js';
+// =======================
+// Update Today's Entries & Create History Button
+// =======================
+
+// Make sure dailyLogs is already imported:
+// import { dailyLogs } from './data/dailyLogs.js';
+
+// Update today's entries
+dailyLogs["2025-12-31"].bloodPressure.push(
+  { systolic: 130, diastolic: 69, heartRate: 80 }, // first reading
+  { systolic: 121, diastolic: 67, heartRate: 80 }, // second reading
+  { systolic: 144, diastolic: 75, heartRate: 87 }, // post-strength
+  { systolic: 137, diastolic: 72, heartRate: 86 }, // latest post-strength
+);
+dailyLogs["2025-12-31"].glucose.push({ value: 5.4 });
+
+// Pre-create Today History Button
+const history = document.getElementById("historyList");
+(function createTodayButton() {
+  const today = "2025-12-31";
+  if (![...history.children].some(b => b.dataset.date === today)) {
+    const btn = document.createElement("button");
+    btn.textContent = today;
+    btn.dataset.date = today;
+    btn.onclick = () => {
+      renderDailySummary(today);
+      renderBPTrends(today, 7);
+    };
+    history.prepend(btn);
+  }
+})();
 
 // =======================
 // Update Today's Entries (2025-12-31)
