@@ -712,3 +712,180 @@ export const dailyLogs = {
   calories: 0,
   heartRate: 0
 },
+// =======================
+// February 2025 (continued)
+// =======================
+"2025-02-11": {
+  bloodPressure: [],
+  glucose: [{ value: 5 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-12": {
+  bloodPressure: [{ systolic: 126, diastolic: 76, heartRate: 90 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-13": {
+  bloodPressure: [],
+  glucose: [{ value: 6.3 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-14": {
+  bloodPressure: [
+    { systolic: 124, diastolic: 67, heartRate: 73 },
+    { systolic: 127, diastolic: 69, heartRate: 73 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-15": {
+  bloodPressure: [],
+  glucose: [{ value: 6.4 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+// =======================
+// February 2025 (continued)
+// =======================
+"2025-02-16": {
+  bloodPressure: [{ systolic: 124, diastolic: 73, heartRate: 79 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-17": {
+  bloodPressure: [
+    { systolic: 129, diastolic: 73, heartRate: 74 },
+    { systolic: 98, diastolic: 69, heartRate: 72 }
+  ],
+  glucose: [{ value: 6.5 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-18": {
+  bloodPressure: [],
+  glucose: [{ value: 4.9 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-19": {
+  bloodPressure: [{ systolic: 126, diastolic: 65, heartRate: 75 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-20": {
+  bloodPressure: [],
+  glucose: [{ value: 6.2 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+// =======================
+// February 2025 (continued)
+// =======================
+"2025-02-21": {
+  bloodPressure: [
+    { systolic: 136, diastolic: 64, heartRate: 92 },
+    { systolic: 123, diastolic: 60, heartRate: 87 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-22": {
+  bloodPressure: [],
+  glucose: [{ value: 9.2 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-24": {
+  bloodPressure: [
+    { systolic: 139, diastolic: 77, heartRate: 86 },
+    { systolic: 140, diastolic: 77, heartRate: 85 }
+  ],
+  glucose: [{ value: 6.7 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-25": {
+  bloodPressure: [],
+  glucose: [{ value: 7 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-26": {
+  bloodPressure: [{ systolic: 120, diastolic: 59, heartRate: 82 }],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-27": {
+  bloodPressure: [],
+  glucose: [{ value: 6.9 }],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
+"2025-02-28": {
+  bloodPressure: [
+    { systolic: 124, diastolic: 71, heartRate: 86 },
+    { systolic: 128, diastolic: 72, heartRate: 85 }
+  ],
+  glucose: [],
+  walk: 0,
+  treadmill: 0,
+  strength: 0,
+  calories: 0,
+  heartRate: 0
+},
