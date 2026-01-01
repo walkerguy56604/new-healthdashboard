@@ -8,7 +8,12 @@ export const dailyLogs = {
     glucose: [
       { value: 6.4, time: "08:15" }
     ],
-    walk: 45,
+    walk: {
+      siriMorning: 5,        // your Siri walk 4:25–4:30
+      miniWalk1: 5,          // first 5-min walk later
+      miniWalk2: 5,          // second 5-min walk later
+      outside: 45            // main 45-min walk including treadmill/strength
+    },
     treadmill: {
       duration: 10,
       start: "10:35",
@@ -28,7 +33,6 @@ export const dailyLogs = {
     heartRate: 88
   },
 
-  // Rest of January can still be pre-filled as empty
   "2026-01-02": { bloodPressure: [], glucose: [], walk:0, treadmill:0, strength:0, calories:0, heartRate:0 },
   "2026-01-03": { bloodPressure: [], glucose: [], walk:0, treadmill:0, strength:0, calories:0, heartRate:0 },
   // ...continue for all days
