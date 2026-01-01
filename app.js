@@ -2,7 +2,32 @@
 // Import Daily Logs
 // =======================
 import { dailyLogs } from './data/dailyLogs.js';
+// =======================
+// Import Daily Logs
+// =======================
+import { dailyLogs } from './data/dailyLogs.js';
 
+// =======================
+// Pre-fill Today's Entries (Blood Pressure, Glucose, Activity)
+// =======================
+const today = "2025-12-31";
+
+dailyLogs[today].bloodPressure.push(
+  { systolic: 130, diastolic: 69, heartRate: 80 }, // first reading
+  { systolic: 121, diastolic: 67, heartRate: 80 }, // second reading
+  { systolic: 144, diastolic: 75, heartRate: 87 }, // post-strength
+  { systolic: 137, diastolic: 72, heartRate: 86 }, // latest post-strength
+  { systolic: 125, diastolic: 59, heartRate: 88 }  // post-walk/treadmill
+);
+
+dailyLogs[today].glucose.push({ value: 5.4 });
+
+// Pre-fill Activity
+dailyLogs[today].walk = 45;        // minutes for after-dinner walk
+dailyLogs[today].treadmill = 10;   // minutes on treadmill
+dailyLogs[today].strength = 14;    // total reps from strength training
+dailyLogs[today].calories = 11;    // calories from treadmill session
+dailyLogs[today].heartRate = 97;   // average heart rate during walk/treadmill
 // =======================
 // Today's Entries Setup
 // =======================
