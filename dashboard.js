@@ -1,3 +1,4 @@
+import { dailyLogs } from "./data/dailyLogs.js";
 import { dailyLogs } from './dailyLogs.js';
 
 const today = "2025-12-31";
