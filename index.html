@@ -41,7 +41,19 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <!-- Main App -->
   <script type="module" src="app.js"></script>
+
+  <script type="module">
+    import { renderDailySummary, renderBPTrends } from './app.js';
+    const picker = document.getElementById('datePicker');
+    const today = new Date().toISOString().split('T')[0];
+    picker.value = today;
+
+    // Auto-render today's summary and 7-day trends
+    renderDailySummary(today);
+    renderBPTrends(today, 7);
+  </script>
 </body>
 </html>
