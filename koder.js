@@ -159,3 +159,110 @@ export const dailyLogs = {
     glucose: [{ value: 8.4 }], walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 78 
   }
 };
+// =======================
+// Daily Logs (Entries 26–200)
+// =======================
+export const dailyLogs = {
+  "2024-12-15": {
+    bloodPressure: [
+      { systolic: 130, diastolic: 68, heartRate: 89, note: "M" },
+      { systolic: 135, diastolic: 68, heartRate: 87, note: "M" }
+    ],
+    glucose: [{ value: 7.4 }],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 88
+  },
+  "2024-12-17": {
+    bloodPressure: [
+      { systolic: 132, diastolic: 68, heartRate: 86, note: "M" }
+    ],
+    glucose: [],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 86
+  },
+  "2024-12-19": {
+    bloodPressure: [
+      { systolic: 120, diastolic: 63, heartRate: 85, note: "M" },
+      { systolic: 116, diastolic: 68, heartRate: 85, note: "L", note2: "IHB" },
+      { systolic: 118, diastolic: 71, heartRate: 87, note: "L" }
+    ],
+    glucose: [],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 86
+  },
+  "2024-12-21": {
+    bloodPressure: [
+      { systolic: 128, diastolic: 69, heartRate: 84, note: "M" }
+    ],
+    glucose: [{ value: 7.9 }],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 84
+  },
+  "2024-12-22": {
+    bloodPressure: [
+      { systolic: 123, diastolic: 65, heartRate: 82, note: "M" },
+      { systolic: 122, diastolic: 60, heartRate: 81, note: "M" }
+    ],
+    glucose: [{ value: 7.2 }],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 82
+  },
+  "2024-12-24": {
+    bloodPressure: [
+      { systolic: 123, diastolic: 62, heartRate: 79, note: "M" }
+    ],
+    glucose: [{ value: 5.8 }],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 79
+  },
+  "2024-12-27": {
+    bloodPressure: [
+      { systolic: 124, diastolic: 66, heartRate: 80, note: "M" },
+      { systolic: 117, diastolic: 66, heartRate: 81, note: "L" }
+    ],
+    glucose: [{ value: 4.4 }],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 80
+  },
+  "2024-12-28": {
+    bloodPressure: [
+      { systolic: 121, diastolic: 69, heartRate: 85, note: "M", note2: "IHB" },
+      { systolic: 133, diastolic: 71, heartRate: 88, note: "H" },
+      { systolic: 129, diastolic: 74, heartRate: 89, note: "M" },
+      { systolic: 136, diastolic: 70, heartRate: 94, note: "H" },
+      { systolic: 121, diastolic: 73, heartRate: 96, note: "M" },
+      { systolic: 114, diastolic: 59, heartRate: 94, note: "L" },
+      { systolic: 135, diastolic: 70, heartRate: 94, note: "H" },
+      { systolic: 120, diastolic: 63, heartRate: 95, note: "M" }
+    ],
+    glucose: [],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 90
+  },
+  "2024-12-29": {
+    bloodPressure: [
+      { systolic: 129, diastolic: 73, heartRate: 84, note: "M" },
+      { systolic: 127, diastolic: 70, heartRate: 84, note: "M" },
+      { systolic: 122, diastolic: 74, heartRate: 89, note: "M" },
+      { systolic: 128, diastolic: 67, heartRate: 94, note: "M", note2: "IHB" },
+      { systolic: 130, diastolic: 71, heartRate: 94, note: "H" },
+      { systolic: 128, diastolic: 76, heartRate: 94, note: "M" },
+      { systolic: 122, diastolic: 67, heartRate: 90, note: "M" }
+    ],
+    glucose: [],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 90
+  },
+  "2024-12-30": {
+    bloodPressure: [
+      { systolic: 141, diastolic: 74, heartRate: 89, note: "H" },
+      { systolic: 127, diastolic: 67, heartRate: 92, note: "M" }
+    ],
+    glucose: [],
+    walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 91
+  },
+  "2024-12-31": {
+    bloodPressure: [
+      { systolic: 130, diastolic: 69, heartRate: 80 },
+      { systolic: 121, diastolic: 67, heartRate: 80 },
+      { systolic: 144, diastolic: 75, heartRate: 87, note: "after strength" },
+      { systolic: 137, diastolic: 72, heartRate: 86, note: "final post-strength" },
+      { systolic: 132, diastolic: 73, heartRate: 86, note: "after treadmill" },
+      { systolic: 128, diastolic: 68, heartRate: 85, note: "2nd post treadmill" }
+    ],
+    glucose: [{ value: 5.4 }],
+    walk: 10, treadmill: 10, strength: 12, calories: 12, heartRate: 141
+  }
+  // … continue with entries 201–200 if needed
+};
