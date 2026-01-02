@@ -37,3 +37,17 @@ export const dailyLogs = {
   "2026-01-03": { bloodPressure: [], glucose: [], walk:0, treadmill:0, strength:0, calories:0, heartRate:0 },
   // ...continue for all days
 };
+"2026-01-01": {
+  bloodPressure: [
+    { systolic: 117, diastolic: 69, heartRate: 88, note: "Morning, low hypertension" },
+    { systolic: 135, diastolic: 71, heartRate: 88, note: "5 min after treadmill & strength training, high hypertension" }
+  ],
+  glucose: [
+    { value: 6.4, time: "early morning" }
+  ],
+  walk: 45,        // total minutes for today including Siri and non-Siri walks
+  treadmill: 10,   // treadmill minutes
+  strength: 14,    // total reps for today
+  calories: 11,    // calories burned from treadmill/strength
+  heartRate: 88    // last recorded average HR
+}
