@@ -1,69 +1,30 @@
-<script src="main.js" type="module"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Health Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1, h2, h3, h4 { margin-bottom: 5px; }
-    #historyList button { margin: 2px; padding: 5px 8px; }
-    .bp-high { color: red; }
-    .bp-medium { color: orange; }
-    .bp-low { color: green; }
+    body { font-family: sans-serif; margin: 20px; }
+    h3, h4 { margin-bottom: 5px; }
+    div { margin-bottom: 5px; }
+    button { margin: 2px; }
   </style>
 </head>
 <body>
+
   <h1>Health Dashboard</h1>
 
-  <label for="datePicker">Select Date:</label>
+  <label for="datePicker">Select Date: </label>
   <input type="date" id="datePicker">
 
-  <div id="dailySummaryOutput"></div>
-
-  <h2>History</h2>
   <div id="historyList"></div>
-
-  <h2>Trends</h2>
+  <div id="dailySummaryOutput"></div>
   <canvas id="trendChart" width="600" height="200"></canvas>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="dashboard.js"></script>
+  <div id="exportContainer"></div>
 
-  <script type="module">
-    // ===== Example Multiple Months =====
-    import { dailyLogs } from './DataDailyLogs.js'; // full months
-    import { renderDailySummary } from './dashboard.js';
-
-    const today = "2025-12-31";
-    const picker = document.getElementById("datePicker");
-    const history = document.getElementById("historyList");
-
-    // Preload history buttons for available dates
-    Object.keys(dailyLogs).sort().forEach(date => {
-      const btn = document.createElement('button');
-      btn.textContent = date;
-      btn.dataset.date = date;
-      btn.onclick = () => renderDailySummary(date);
-      history.appendChild(btn);
-    });
-
-    // Set initial date picker and render today's summary
-    picker.value = today;
-    renderDailySummary(today);
-
-    picker.addEventListener("change", e => {
-      const date = e.target.value;
-      renderDailySummary(date);
-      if (![...history.children].some(b => b.dataset.date === date)) {
-        const btn = document.createElement('button');
-        btn.textContent = date;
-        btn.dataset.date = date;
-        btn.onclick = () => renderDailySummary(date);
-        history.prepend(btn);
-      }
-    });
-  </script>
+  <!-- Your main JavaScript file -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>
