@@ -1895,3 +1895,65 @@ export const dailyLogs = {
   calories: 22,    // Total calories from treadmill + strength
   heartRate: 88    // Average heart rate (can be adjusted if you want)
 }
+  "2025-08-01": {
+    bloodPressure: [
+      { systolic: 129, diastolic: 68, heartRate: 74 },
+      { systolic: 122, diastolic: 54, heartRate: 71 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+
+  "2025-08-04": {
+    bloodPressure: [
+      { systolic: 115, diastolic: 77, heartRate: 75 },
+      { systolic: 111, diastolic: 73, heartRate: 75 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+
+  "2025-08-06": {
+    bloodPressure: [
+      { systolic: 124, diastolic: 50, heartRate: 73 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+
+  "2025-08-08": {
+    bloodPressure: [
+      { systolic: 126, diastolic: 63, heartRate: 76 },
+      { systolic: 123, diastolic: 66, heartRate: 73 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
+
+  "2025-08-10": {
+    bloodPressure: [
+      { systolic: 124, diastolic: 71, heartRate: 74 }
+    ],
+    glucose: [],
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    heartRate: 0
+  },
