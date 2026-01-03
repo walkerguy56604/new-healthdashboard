@@ -1,7 +1,7 @@
 // =======================
 // Import Daily Logs
 // =======================
-import { dailyLogs } from './data/dailyLogs.js'; // make sure you have your JSON data
+import { dailyLogs } from './data/dailyLogs.js'; // make sure this path matches your setup
 
 // =======================
 // Helpers
@@ -34,17 +34,19 @@ function get7DayRolling(date) {
     day.bloodPressure.forEach(bp => { sums.sys += bp.systolic; sums.dia += bp.diastolic; sums.bpCount++; });
     day.glucose.forEach(g => { sums.glucose += g.value !== undefined ? g.value : g; sums.glucoseCount++; });
     sums.walk += day.walk || 0;
-    sums.treadmill += day.treadmill || 0;
+    if (Array.isArray(day.treadmill)) day.treadmill.forEach(t => sums.treadmill += t.distance || 0);
     sums.strength += day.strength || 0;
     sums.calories += day.calories || 0;
-    if (day.heartRate !== undefined) { sums.heartRate += day.heartRate; sums.hrCount++; }
+    if (day.heartRate !== undefined && day.heartRate !== null) { sums.heartRate += day.heartRate; sums.hrCount++; }
   });
 
   return {
     bpSys: sums.bpCount ? (sums.sys / sums.bpCount).toFixed(1) : "—",
     bpDia: sums.bpCount ? (sums.dia / sums.bpCount).toFixed(1) : "—",
     glucose: sums.glucoseCount ? (sums.glucose / sums.glucoseCount).toFixed(1) : "—",
-    walk: sums.walk, treadmill: sums.treadmill, strength: sums.strength,
+    walk: sums.walk,
+    treadmill: sums.treadmill,
+    strength: sums.strength,
     calories: sums.calories,
     heartRate: sums.hrCount ? (sums.heartRate / sums.hrCount).toFixed(0) : "—"
   };
@@ -62,21 +64,33 @@ export function renderDailySummary(date) {
   if (d.bloodPressure.length) {
     d.bloodPressure.forEach((bp, i) => {
       const cat = getBPCategory(bp.systolic, bp.diastolic);
-      html += `<div style="color:${getBPColor(cat)}">BP #${i+1}: ${bp.systolic}/${bp.diastolic} HR:${bp.heartRate} (${cat})</div>`;
+      const catText = cat === "H" ? "High" : cat === "M" ? "Medium" : "Low";
+      html += `<div style="color:${getBPColor(cat)}">BP #${i+1}: ${bp.systolic}/${bp.diastolic} HR:${bp.heartRate} (${catText})${bp.note ? " – " + bp.note : ""}</div>`;
     });
   } else html += "<div>No BP recorded</div>";
 
   html += `<h4>Glucose</h4>`;
   if (d.glucose.length) {
-    d.glucose.forEach(g => html += `<div>${g.value !== undefined ? g.value : g} mmol/L${g.time ? " (Time:" + g.time + ")" : ""}</div>`);
+    d.glucose.forEach(g => html += `<div>${g.value !== undefined ? g.value : g} mmol/L${g.time ? " (" + g.time + ")" : ""}</div>`);
   } else html += "<div>No glucose</div>";
 
   html += `<h4>Activity</h4>
-    <div>Walk: ${d.walk}</div>
-    <div>Treadmill: ${d.treadmill}</div>
-    <div>Strength: ${d.strength}</div>
-    <div>Calories: ${d.calories}</div>
-    <div>Avg HR: ${d.heartRate}</div>`;
+    <div>Walk: ${d.walk || 0} min</div>
+    <div>Treadmill: ${
+      Array.isArray(d.treadmill) && d.treadmill.length
+        ? d.treadmill.map(t => `${t.distance} km (${t.calories} cal)`).join(", ")
+        : 0
+    }</div>
+    <div>Strength: ${d.strength || 0} min</div>
+    <div>Calories: ${d.calories || 0}</div>
+    <div>Avg HR: ${d.heartRate !== null && d.heartRate !== undefined ? d.heartRate : "—"}</div>`;
+
+  // Optional notes
+  if (d.notes && d.notes.length) {
+    html += `<h4>Notes</h4><ul>`;
+    d.notes.forEach(note => html += `<li>${note}</li>`);
+    html += `</ul>`;
+  }
 
   const r = get7DayRolling(date);
   html += `<h4>7-Day Rolling Averages</h4>
@@ -98,5 +112,5 @@ window.renderDailySummary = renderDailySummary;
 
 // Example: render today's summary
 const today = new Date().toISOString().split('T')[0];
-if (!dailyLogs[today]) dailyLogs[today] = { bloodPressure: [], glucose: [], walk:0, treadmill:0, strength:0, calories:0, heartRate:0 };
+if (!dailyLogs[today]) dailyLogs[today] = { bloodPressure: [], glucose: [], walk:0, treadmill:[], strength:0, calories:0, heartRate:null, notes:[] };
 renderDailySummary(today);
