@@ -12,12 +12,15 @@ function getBPCategory(s, d) {
     return "L";
 }
 
-function get7DayRolling(date) {
+function getRollingWindow(date, days = 7) {
     const allDates = Object.keys(dailyLogs).sort();
     const idx = allDates.indexOf(date);
-    if (idx === -1) return {};
-    const windowDates = allDates.slice(Math.max(0, idx - 6), idx + 1);
+    if (idx === -1) return [];
+    return allDates.slice(Math.max(0, idx - (days-1)), idx + 1);
+}
 
+function calculate7DayRolling(date) {
+    const windowDates = getRollingWindow(date, 7);
     const sums = { sys:0, dia:0, bpCount:0, walk:0, treadmill:0, strength:0, calories:0, heartRate:0, hrCount:0 };
 
     windowDates.forEach(d => {
@@ -55,13 +58,15 @@ export function renderDailySummary(date) {
 
     html += `<div class="category">Blood Pressure</div>`;
     if (d.bloodPressure.length) {
+        let shown = false;
         d.bloodPressure.forEach((bp, i) => {
             const cat = getBPCategory(bp.systolic, bp.diastolic);
-            if (bpFilter !== "all" && bpFilter !== cat) return; // Skip if filter doesn't match
+            if (bpFilter !== "all" && bpFilter !== cat) return;
+            shown = true;
             const catText = cat === "H" ? "High" : cat === "M" ? "Medium" : "Low";
             html += `<p>BP #${i+1}: ${bp.systolic}/${bp.diastolic} HR:${bp.heartRate} (${catText})${bp.note ? " – " + bp.note : ""}</p>`;
         });
-        if (!html.includes("BP #")) html += `<p>No BP recorded for selected filter</p>`;
+        if (!shown) html += `<p>No BP recorded for selected filter</p>`;
     } else html += `<p>No BP recorded</p>`;
 
     html += `<div class="category">Activity</div>
@@ -76,7 +81,7 @@ export function renderDailySummary(date) {
         d.notes.forEach(note => html += `<p>• ${note}</p>`);
     }
 
-    const r = get7DayRolling(date);
+    const r = calculate7DayRolling(date);
     html += `<div class="category">7-Day Rolling Averages</div>
     <p>BP: ${r.bpSys}/${r.bpDia}</p>
     <p>Walk: ${r.walk}</p>
@@ -85,7 +90,55 @@ export function renderDailySummary(date) {
     <p>Calories: ${r.calories}</p>
     <p>Avg HR: ${r.heartRate}</p>`;
 
+    html += `<canvas id="rollingChart" width="400" height="150"></canvas>`;
+
     out.innerHTML = html;
+
+    drawRollingChart(date);
+}
+
+// =======================
+// Draw Rolling Chart
+// =======================
+function drawRollingChart(date) {
+    const canvas = document.getElementById("rollingChart");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const windowDates = getRollingWindow(date, 7);
+
+    const sysData = [], diaData = [], walkData = [], strengthData = [];
+    windowDates.forEach(d => {
+        const day = dailyLogs[d];
+        sysData.push(day?.bloodPressure[0]?.systolic || 0);
+        diaData.push(day?.bloodPressure[0]?.diastolic || 0);
+        walkData.push(day?.walk || 0);
+        strengthData.push(day?.strength || 0);
+    });
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const colors = { sys: "#ff3b30", dia: "#ff9500", walk: "#34c759", strength: "#007aff" };
+    const dataSets = [
+        { data: sysData, color: colors.sys },
+        { data: diaData, color: colors.dia },
+        { data: walkData, color: colors.walk },
+        { data: strengthData, color: colors.strength }
+    ];
+
+    const maxVal = Math.max(...sysData, ...diaData, ...walkData, ...strengthData, 100);
+
+    dataSets.forEach(ds => {
+        ctx.beginPath();
+        ds.data.forEach((val, i) => {
+            const x = (i / (ds.data.length - 1)) * canvas.width;
+            const y = canvas.height - (val / maxVal) * canvas.height;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = ds.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
 }
 
 // =======================
@@ -102,7 +155,7 @@ Object.keys(dailyLogs).sort().forEach(date => {
     datePicker.appendChild(option);
 });
 
-// Render summary when date changes
+// Render summary when date or filter changes
 datePicker.addEventListener("change", () => renderDailySummary(datePicker.value));
 bpFilter.addEventListener("change", () => renderDailySummary(datePicker.value));
 
