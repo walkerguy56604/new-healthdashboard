@@ -1,54 +1,80 @@
 // =======================
 // Import Daily Logs
 // =======================
-import { dailyLogs } from './data/dailyLogs.js'; // make sure this path matches your setup
+import { dailyLogs } from './data/dailyLogs.js';
 
 // =======================
 // Helpers
 // =======================
 function getBPCategory(s, d) {
-  if (s >= 140 || d >= 90) return "H";
-  if (s >= 120 || d >= 80) return "M";
-  return "L";
+  if (s >= 140 || d >= 90) return { label: "High", code: "H", color: "red" };
+  if (s >= 120 || d >= 80) return { label: "Medium", code: "M", color: "orange" };
+  return { label: "Low", code: "L", color: "green" };
 }
 
-function getBPColor(cat) {
-  return cat === "H" ? "red" : cat === "M" ? "orange" : "green";
+function safe(val, fallback = "—") {
+  return val !== undefined && val !== null ? val : fallback;
+}
+
+function getSortedDates() {
+  return Object.keys(dailyLogs).sort();
 }
 
 function getLastNDates(endDate, n) {
-  const allDates = Object.keys(dailyLogs).sort();
-  const idx = allDates.indexOf(endDate);
+  const dates = getSortedDates();
+  const idx = dates.indexOf(endDate);
   if (idx === -1) return [];
-  return allDates.slice(Math.max(0, idx - n + 1), idx + 1);
+  return dates.slice(Math.max(0, idx - n + 1), idx + 1);
 }
 
+// =======================
+// 7‑Day Rolling Averages
+// =======================
 function get7DayRolling(date) {
   const windowDates = getLastNDates(date, 7);
-  let sums = { sys: 0, dia: 0, bpCount: 0, glucose: 0, glucoseCount: 0, walk: 0, treadmill: 0, strength: 0, calories: 0, heartRate: 0, hrCount: 0 };
-  
+
+  let sums = {
+    sys: 0, dia: 0, bpCount: 0,
+    glucose: 0, glucoseCount: 0,
+    walk: 0, treadmill: 0,
+    strength: 0, calories: 0,
+    hr: 0, hrCount: 0
+  };
+
   windowDates.forEach(d => {
     const day = dailyLogs[d];
     if (!day) return;
-    
-    day.bloodPressure.forEach(bp => { sums.sys += bp.systolic; sums.dia += bp.diastolic; sums.bpCount++; });
-    day.glucose.forEach(g => { sums.glucose += g.value !== undefined ? g.value : g; sums.glucoseCount++; });
+
+    (day.bloodPressure || []).forEach(bp => {
+      sums.sys += bp.systolic;
+      sums.dia += bp.diastolic;
+      sums.bpCount++;
+    });
+
+    (day.glucose || []).forEach(g => {
+      sums.glucose += g.value ?? g;
+      sums.glucoseCount++;
+    });
+
     sums.walk += day.walk || 0;
-    if (Array.isArray(day.treadmill)) day.treadmill.forEach(t => sums.treadmill += t.distance || 0);
+    (day.treadmill || []).forEach(t => sums.treadmill += t.distance || 0);
     sums.strength += day.strength || 0;
     sums.calories += day.calories || 0;
-    if (day.heartRate !== undefined && day.heartRate !== null) { sums.heartRate += day.heartRate; sums.hrCount++; }
+
+    if (day.heartRate !== null && day.heartRate !== undefined) {
+      sums.hr += day.heartRate;
+      sums.hrCount++;
+    }
   });
 
   return {
-    bpSys: sums.bpCount ? (sums.sys / sums.bpCount).toFixed(1) : "—",
-    bpDia: sums.bpCount ? (sums.dia / sums.bpCount).toFixed(1) : "—",
-    glucose: sums.glucoseCount ? (sums.glucose / sums.glucoseCount).toFixed(1) : "—",
+    bp: sums.bpCount ? `${(sums.sys/sums.bpCount).toFixed(1)}/${(sums.dia/sums.bpCount).toFixed(1)}` : "—",
+    glucose: sums.glucoseCount ? (sums.glucose/sums.glucoseCount).toFixed(1) : "—",
     walk: sums.walk,
-    treadmill: sums.treadmill,
+    treadmill: sums.treadmill.toFixed(2),
     strength: sums.strength,
     calories: sums.calories,
-    heartRate: sums.hrCount ? (sums.heartRate / sums.hrCount).toFixed(0) : "—"
+    hr: sums.hrCount ? Math.round(sums.hr/sums.hrCount) : "—"
   };
 }
 
@@ -58,59 +84,112 @@ function get7DayRolling(date) {
 export function renderDailySummary(date) {
   const out = document.getElementById("dailySummaryOutput");
   const d = dailyLogs[date];
-  if (!d) { out.innerHTML = `<div>No data for ${date}</div>`; return; }
 
-  let html = `<h3>${date}</h3><h4>Blood Pressure</h4>`;
+  if (!d) {
+    out.innerHTML = `<pre>No data for ${date}</pre>`;
+    return;
+  }
+
+  let html = `<pre>
+📅 ${date}
+
+====================
+Blood Pressure
+====================
+`;
+
   if (d.bloodPressure.length) {
     d.bloodPressure.forEach((bp, i) => {
       const cat = getBPCategory(bp.systolic, bp.diastolic);
-      const catText = cat === "H" ? "High" : cat === "M" ? "Medium" : "Low";
-      html += `<div style="color:${getBPColor(cat)}">BP #${i+1}: ${bp.systolic}/${bp.diastolic} HR:${bp.heartRate} (${catText})${bp.note ? " – " + bp.note : ""}</div>`;
+      html += `#${i+1}  ${bp.systolic}/${bp.diastolic}  HR:${safe(bp.heartRate)}
+Category: ${cat.label}
+${bp.note ? "Note: " + bp.note : ""}
+\n`;
     });
-  } else html += "<div>No BP recorded</div>";
+  } else {
+    html += "No BP recorded\n\n";
+  }
 
-  html += `<h4>Glucose</h4>`;
+  html += `====================
+Glucose
+====================
+`;
+
   if (d.glucose.length) {
-    d.glucose.forEach(g => html += `<div>${g.value !== undefined ? g.value : g} mmol/L${g.time ? " (" + g.time + ")" : ""}</div>`);
-  } else html += "<div>No glucose</div>";
+    d.glucose.forEach(g => {
+      html += `${g.value ?? g} mmol/L ${g.time ? "(" + g.time + ")" : ""}\n`;
+    });
+  } else {
+    html += "No glucose recorded\n\n";
+  }
 
-  html += `<h4>Activity</h4>
-    <div>Walk: ${d.walk || 0} min</div>
-    <div>Treadmill: ${
-      Array.isArray(d.treadmill) && d.treadmill.length
-        ? d.treadmill.map(t => `${t.distance} km (${t.calories} cal)`).join(", ")
-        : 0
-    }</div>
-    <div>Strength: ${d.strength || 0} min</div>
-    <div>Calories: ${d.calories || 0}</div>
-    <div>Avg HR: ${d.heartRate !== null && d.heartRate !== undefined ? d.heartRate : "—"}</div>`;
+  html += `====================
+Activity
+====================
+Walk: ${safe(d.walk, 0)} min
+Treadmill: ${
+    Array.isArray(d.treadmill) && d.treadmill.length
+      ? d.treadmill.map(t => `${t.distance} km (${t.calories} cal)`).join(", ")
+      : "0"
+}
+Strength: ${safe(d.strength, 0)} min
+Calories: ${safe(d.calories, 0)}
+Avg HR: ${safe(d.heartRate)}
+`;
 
-  // Optional notes
   if (d.notes && d.notes.length) {
-    html += `<h4>Notes</h4><ul>`;
-    d.notes.forEach(note => html += `<li>${note}</li>`);
-    html += `</ul>`;
+    html += `\n====================
+Notes
+====================
+`;
+    d.notes.forEach(n => html += `• ${n}\n`);
   }
 
   const r = get7DayRolling(date);
-  html += `<h4>7-Day Rolling Averages</h4>
-    <div>BP: ${r.bpSys}/${r.bpDia}</div>
-    <div>Glucose: ${r.glucose}</div>
-    <div>Walk: ${r.walk}</div>
-    <div>Treadmill: ${r.treadmill}</div>
-    <div>Strength: ${r.strength}</div>
-    <div>Calories: ${r.calories}</div>
-    <div>Avg HR: ${r.heartRate}</div>`;
+
+  html += `\n====================
+7‑Day Rolling Avg
+====================
+BP: ${r.bp}
+Glucose: ${r.glucose}
+Walk: ${r.walk}
+Treadmill: ${r.treadmill}
+Strength: ${r.strength}
+Calories: ${r.calories}
+Avg HR: ${r.hr}
+</pre>`;
 
   out.innerHTML = html;
 }
 
 // =======================
-// Initialize
+// Date Picker Setup
+// =======================
+function initDatePicker() {
+  const picker = document.getElementById("datePicker");
+  if (!picker) return;
+
+  const dates = getSortedDates();
+  picker.innerHTML = "";
+
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    picker.appendChild(opt);
+  });
+
+  picker.value = dates[dates.length - 1];
+  picker.addEventListener("change", e => renderDailySummary(e.target.value));
+}
+
+// =======================
+// Init
 // =======================
 window.renderDailySummary = renderDailySummary;
 
-// Example: render today's summary
-const today = new Date().toISOString().split('T')[0];
-if (!dailyLogs[today]) dailyLogs[today] = { bloodPressure: [], glucose: [], walk:0, treadmill:[], strength:0, calories:0, heartRate:null, notes:[] };
-renderDailySummary(today);
+document.addEventListener("DOMContentLoaded", () => {
+  initDatePicker();
+  const today = new Date().toISOString().split("T")[0];
+  renderDailySummary(dailyLogs[today] ? today : getSortedDates().slice(-1)[0]);
+});
