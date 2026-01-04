@@ -1,24 +1,29 @@
+import { dailyLogs } from './dailylogs.js'; // Make sure path is correct
+import { renderDailySummary } from './main.js'; // Use the new main.js function
+
+// ====== Elements ======
 const datePicker = document.getElementById("datePicker");
+const bpFilter = document.getElementById("bpFilter"); // optional filter dropdown
 
-datePicker.value = "2026-01-03";
-
-datePicker.addEventListener("change", (e) => {
-  const selectedDate = e.target.value;
-  const out = document.getElementById("dailySummaryOutput");
-
-  if (!dailyLogs[selectedDate]) {
-    out.innerHTML = `<h3>${selectedDate}</h3><div>No data for this day</div>`;
-    return;
-  }
-
-  const d = dailyLogs[selectedDate];
-
-  out.innerHTML = `
-    <h3>${selectedDate}</h3>
-    <div>Walk: ${d.walk}</div>
-    <div>Treadmill: ${d.treadmill}</div>
-    <div>Strength: ${d.strength}</div>
-    <div>Calories: ${d.calories}</div>
-    <div>Avg HR: ${d.heartRate ?? "—"}</div>
-  `;
+// ====== Populate Date Picker ======
+Object.keys(dailyLogs).sort().forEach(date => {
+    const option = document.createElement("option");
+    option.value = date;
+    option.text = date;
+    datePicker.appendChild(option);
 });
+
+// ====== Refresh Summary ======
+function refreshSummary() {
+    renderDailySummary(datePicker.value, bpFilter ? bpFilter.value : "all");
+}
+
+// ====== Event Listeners ======
+datePicker.addEventListener("change", refreshSummary);
+if (bpFilter) bpFilter.addEventListener("change", refreshSummary);
+
+// ====== Initial Render ======
+if (datePicker.options.length) {
+    datePicker.value = datePicker.options[0].value;
+    refreshSummary();
+}
