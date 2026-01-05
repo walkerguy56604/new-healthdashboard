@@ -2,7 +2,7 @@
 // Daily Logs (Data)
 // =======================
 
-const dailyLogs = {
+export const dailyLogs = {
   "2026-01-02": {
     walk: 30,
     strength: 18,
@@ -19,6 +19,14 @@ const dailyLogs = {
     bp: { sys: 132, dia: 70 },
     hr: 105
   },
+  "2026-01-04": {
+    walk: 35,
+    strength: 30,
+    treadmill: 10,
+    calories: 12,
+    bp: { sys: 132, dia: 80 },
+    hr: 102
+  },
   "2026-01-05": {
     walk: 10,
     strength: 18,
@@ -34,7 +42,7 @@ const dailyLogs = {
 // =======================
 
 function getRollingDays() {
-  return 3; // change to 7, 14, 30 later if you want
+  return 3; // you can change this to 7, 14, or 30 for a longer rolling window
 }
 
 // =======================
@@ -85,7 +93,7 @@ function getRolling(date, days) {
 // =======================
 
 function render(date) {
-  const out = document.getElementById("output");
+  const out = document.getElementById("dailySummaryOutput");
 
   if (!dailyLogs[date]) {
     out.innerHTML = `<h3>${date}</h3><div>No data logged</div>`;
@@ -99,7 +107,7 @@ function render(date) {
   out.innerHTML = `
     <h3>${date}</h3>
 
-    <h4>Daily</h4>
+    <h4>Daily Stats</h4>
     <div>Walk: ${d.walk} min</div>
     <div>Strength: ${d.strength} min</div>
     <div>Treadmill: ${d.treadmill} min</div>
@@ -107,7 +115,7 @@ function render(date) {
     <div>BP: ${d.bp.sys}/${d.bp.dia}</div>
     <div>HR: ${d.hr}</div>
 
-    <h4>${days}-Day Rolling</h4>
+    <h4>${days}-Day Rolling Avg</h4>
     <div>Walk: ${r.walk} min</div>
     <div>Strength: ${r.strength} min</div>
     <div>Treadmill: ${r.treadmill} min</div>
@@ -118,28 +126,25 @@ function render(date) {
 }
 
 // =======================
-// Hook Date Picker
+// Initialize Date Picker
 // =======================
 
-document.getElementById("datePicker").addEventListener("change", e => {
-  render(e.target.value);
-});
-// Hook Date Picker and populate options
 const datePicker = document.getElementById("datePicker");
-const output = document.getElementById("dailySummaryOutput");
 
-// Populate dropdown
-Object.keys(dailyLogs).sort().forEach(date => {
-  const opt = document.createElement("option");
-  opt.value = date;
-  opt.textContent = date;
-  datePicker.appendChild(opt);
-});
+// Populate dropdown with dates from dailyLogs
+Object.keys(dailyLogs)
+  .sort()
+  .forEach(date => {
+    const opt = document.createElement("option");
+    opt.value = date;
+    opt.textContent = date;
+    datePicker.appendChild(opt);
+  });
 
-// Render initially
+// Render first date by default
 render(Object.keys(dailyLogs).sort()[0]);
 
-// Handle change
+// Update display when user selects a date
 datePicker.addEventListener("change", e => {
   render(e.target.value);
 });
