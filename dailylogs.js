@@ -8,36 +8,12 @@ export const dailyLogs = {
     ],
     strength: 29,
     strengthDetails: [
-      {
-        time: "07:48–08:03",
-        duration: 15,
-        exercises: "3x10 lateral raises, 3x10 biceps",
-        restAfter: 5
-      },
-      {
-        time: "16:06–16:20",
-        duration: 14,
-        exercises: "3x10 lateral raises, 3x10 biceps",
-        restAfter: 5
-      }
+      { time: "07:48–08:03", duration: 15, exercises: "3x10 lateral raises, 3x10 biceps", restAfter: 5 },
+      { time: "16:06–16:20", duration: 14, exercises: "3x10 lateral raises, 3x10 biceps", restAfter: 5 }
     ],
     treadmill: [
-      {
-        time: "12:25–12:35",
-        speed: 1.4,
-        distance: 0.24,
-        calories: 11,
-        avgHR: 108,
-        maxHR: 151
-      },
-      {
-        time: "Evening",
-        speed: 1.4,
-        distance: 0.24,
-        calories: 11,
-        avgHR: 118,
-        maxHR: 123
-      }
+      { time: "12:25–12:35", speed: 1.4, distance: 0.24, calories: 11, avgHR: 108, maxHR: 151 },
+      { time: "Evening", speed: 1.4, distance: 0.24, calories: 11, avgHR: 118, maxHR: 123 }
     ],
     walk: 0,
     glucose: [],
@@ -64,28 +40,11 @@ export const dailyLogs = {
     ],
     strength: 30,
     strengthDetails: [
-      {
-        time: "08:45–09:00",
-        duration: 15,
-        exercises: "3x10 lateral raises, 3x10 biceps",
-        restAfter: 5
-      },
-      {
-        time: "11:48–12:09",
-        duration: 15,
-        exercises: "3x10 lateral raises, 3x10 biceps",
-        restAfter: 0
-      }
+      { time: "08:45–09:00", duration: 15, exercises: "3x10 lateral raises, 3x10 biceps", restAfter: 5 },
+      { time: "11:48–12:09", duration: 15, exercises: "3x10 lateral raises, 3x10 biceps", restAfter: 0 }
     ],
     treadmill: [
-      {
-        time: "17:30–17:40",
-        speed: 1.4,
-        distance: 0.24,
-        calories: 12,
-        avgHR: 102,
-        maxHR: 151
-      }
+      { time: "17:30–17:40", speed: 1.4, distance: 0.24, calories: 12, avgHR: 102, maxHR: 151 }
     ],
     walk: 35,
     glucose: [],
@@ -104,22 +63,10 @@ export const dailyLogs = {
     ],
     strength: 18,
     strengthDetails: [
-      {
-        time: "08:00–08:18",
-        duration: 18,
-        exercises: "Strength training (various, with short delays)",
-        restAfter: 5
-      }
+      { time: "08:00–08:18", duration: 18, exercises: "Strength training (various, with short delays)", restAfter: 5 }
     ],
     treadmill: [
-      {
-        time: "09:28–09:38",
-        speed: 1.4,
-        distance: 0.24,
-        calories: 12,
-        avgHR: 138,
-        maxHR: 163
-      }
+      { time: "09:28–09:38", speed: 1.4, distance: 0.24, calories: 12, avgHR: 138, maxHR: 163 }
     ],
     walk: 10,
     glucose: [],
