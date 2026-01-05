@@ -1,57 +1,54 @@
-// =======================
-// Imports
-// =======================
-import { dailyLogs } from "./dailylogs.js";
+function getRolling(date, days) {
+  const dates = Object.keys(dailyLogs).sort();
+  const idx = dates.indexOf(date);
+  if (idx === -1) return null;
 
-// =======================
-// DOM Ready Guard
-// =======================
-document.addEventListener("DOMContentLoaded", () => {
-  const datePicker = document.getElementById("datePicker");
-  const output = document.getElementById("dailySummaryOutput");
+  const windowDates = dates.slice(Math.max(0, idx - (days - 1)), idx + 1);
 
-  if (!datePicker) {
-    output.innerHTML = "❌ datePicker element not found";
-    return;
-  }
+  const sums = {
+    sys: 0, dia: 0, bpCount: 0,
+    walk: 0,
+    treadmill: 0,
+    strength: 0,
+    calories: 0,
+    hr: 0, hrCount: 0
+  };
 
-  const dates = Object.keys(dailyLogs || {}).sort();
+  windowDates.forEach(d => {
+    const day = dailyLogs[d];
+    if (!day) return;
 
-  if (!dates.length) {
-    output.innerHTML = "❌ dailyLogs loaded but contains no dates";
-    return;
-  }
+    // BP
+    (day.bloodPressure || []).forEach(bp => {
+      sums.sys += bp.systolic;
+      sums.dia += bp.diastolic;
+      sums.bpCount++;
+    });
 
-  // Populate dropdown
-  dates.forEach(date => {
-    const opt = document.createElement("option");
-    opt.value = date;
-    opt.textContent = date;
-    datePicker.appendChild(opt);
-  });
+    // Activity
+    sums.walk += day.walk || 0;
+    sums.strength += day.strength || 0;
+    sums.calories += day.calories || 0;
 
-  // Render function
-  function render(date) {
-    const d = dailyLogs[date];
-    if (!d) {
-      output.innerHTML = `<h3>${date}</h3><div>No data</div>`;
-      return;
+    // Treadmill distance
+    (day.treadmill || []).forEach(t => {
+      sums.treadmill += t.distance || 0;
+    });
+
+    // Heart rate
+    if (day.heartRate != null) {
+      sums.hr += day.heartRate;
+      sums.hrCount++;
     }
-
-    output.innerHTML = `
-      <h3>${date}</h3>
-      <div><strong>Walk:</strong> ${d.walk ?? 0} min</div>
-      <div><strong>Strength:</strong> ${d.strength ?? 0} min</div>
-      <div><strong>Calories:</strong> ${d.calories ?? "—"}</div>
-      <div><strong>Avg HR:</strong> ${d.heartRate ?? "—"}</div>
-    `;
-  }
-
-  // Initial render
-  render(dates[0]);
-
-  // Change handler
-  datePicker.addEventListener("change", e => {
-    render(e.target.value);
   });
-});
+
+  return {
+    bpSys: sums.bpCount ? (sums.sys / sums.bpCount).toFixed(1) : "—",
+    bpDia: sums.bpCount ? (sums.dia / sums.bpCount).toFixed(1) : "—",
+    walk: sums.walk,
+    treadmill: sums.treadmill.toFixed(2),
+    strength: sums.strength,
+    calories: sums.calories,
+    hr: sums.hrCount ? Math.round(sums.hr / sums.hrCount) : "—"
+  };
+}
