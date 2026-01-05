@@ -99,3 +99,36 @@ export const dailyLogs = {
     ]
   }
 };
+"2026-01-05": {
+  bloodPressure: [
+    // Example: { systolic: 0, diastolic: 0, heartRate: 0, note: "Morning BP" }
+  ],
+  strength: 0,
+  strengthDetails: [
+    // Example:
+    // {
+    //   time: "HH:MM–HH:MM",
+    //   duration: 0,
+    //   exercises: "Description",
+    //   restAfter: 0
+    // }
+  ],
+  treadmill: [
+    // Example:
+    // {
+    //   time: "HH:MM–HH:MM",
+    //   speed: 0,
+    //   distance: 0,
+    //   calories: 0,
+    //   avgHR: 0,
+    //   maxHR: 0
+    // }
+  ],
+  walk: 0, // minutes
+  glucose: [],
+  calories: 0,
+  heartRate: null,
+  notes: [
+    // Example: "Morning Siri walk, HH:MM–HH:MM, X minutes"
+  ]
+}
