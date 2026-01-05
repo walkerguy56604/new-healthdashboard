@@ -1,127 +1,126 @@
-import { dailyLogs } from "./dailylogs.js";
+// =======================
+// Daily Logs (Data)
+// =======================
+
+const dailyLogs = {
+  "2026-01-02": {
+    walk: 30,
+    strength: 18,
+    treadmill: 10,
+    calories: 220,
+    bp: { sys: 135, dia: 72 },
+    hr: 110
+  },
+  "2026-01-03": {
+    walk: 25,
+    strength: 0,
+    treadmill: 10,
+    calories: 180,
+    bp: { sys: 132, dia: 70 },
+    hr: 105
+  },
+  "2026-01-05": {
+    walk: 10,
+    strength: 18,
+    treadmill: 10,
+    calories: 12,
+    bp: { sys: 131, dia: 67 },
+    hr: 138
+  }
+};
+
+// =======================
+// Rolling Window Control
+// =======================
+
+function getRollingDays() {
+  return 3; // change to 7, 14, 30 later if you want
+}
+
 // =======================
 // Rolling Calculations
 // =======================
 
-function getRolling(date, days) }
-  const dates = Object.keys(dailyLogs).sort();
-  const idx = dates.indexOf(date);
-  if (idx === -1) return null;
-
-  const windowDates = dates.slice(
-    Math.max(0, idx - (days - 1)),
-    idx + 1
-  );
-
-  const totals = {
-    sys: 0, dia: 0, bpCount: 0,
-    walk: 0,
-    treadmill: 0,
-    strength: 0,
-    calories: 0,
-    hr: 0, hrCount: 0
-  };
-
-  windowDates.forEach(d => {
-    const day = dailyLogs[d];
-    if (!day) return;
-
-    (day.bloodPressure || []).forEach(bp => {
-      totals.sys += bp.systolic;
-      totals.dia += bp.diastolic;
-      totals.bpCount++;
-    });
-
-    totals.walk += day.walk || 0;
-    totals.strength += day.strength || 0;
-    totals.calories += day.calories || 0;
-
-    (day.treadmill || []).forEach(t => {
-      totals.treadmill += t.distance || 0;
-    });
-
-    if (day.heartRate != null) {
-      totals.hr += day.heartRate;
-      totals.hrCount++;
-    }
-  });
-
-  return {
-    bpSys: totals.bpCount ? (totals.sys / totals.bpCount).toFixed(1) : "—",
-    bpDia: totals.bpCount ? (totals.dia / totals.bpCount).toFixed(1) : "—",
-    walk: totals.walk,
-    treadmill: totals.treadmill.toFixed(2),
-    strength: totals.strength,
-    calories: totals.calories,
-    hr: totals.hrCount
-      ? Math.round(totals.hr / totals.hrCount)
-      : "—"
-  };
-}
-
-function getRollingDays() {
-  return Number(
-    document.querySelector('input[name="rollingDays"]:checked')?.value || 7
-  );
-}
 function getRolling(date, days) {
-  const dates = Object.keys(dailyLogs).sort();
-  const idx = dates.indexOf(date);
-  if (idx === -1) return null;
+  const keys = Object.keys(dailyLogs).sort();
+  const end = keys.indexOf(date);
+  const slice = keys.slice(Math.max(0, end - days + 1), end + 1);
 
-  const windowDates = dates.slice(Math.max(0, idx - (days - 1)), idx + 1);
-
-  const sums = {
-    sys: 0, dia: 0, bpCount: 0,
+  let totals = {
     walk: 0,
-    treadmill: 0,
     strength: 0,
+    treadmill: 0,
     calories: 0,
-    hr: 0, hrCount: 0
+    hr: 0,
+    bpSys: 0,
+    bpDia: 0,
+    count: 0
   };
 
-  windowDates.forEach(d => {
-    const day = dailyLogs[d];
-    if (!day) return;
-
-    // BP
-    (day.bloodPressure || []).forEach(bp => {
-      sums.sys += bp.systolic;
-      sums.dia += bp.diastolic;
-      sums.bpCount++;
-    });
-
-    // Activity
-    sums.walk += day.walk || 0;
-    sums.strength += day.strength || 0;
-    sums.calories += day.calories || 0;
-
-    // Treadmill distance
-    (day.treadmill || []).forEach(t => {
-      sums.treadmill += t.distance || 0;
-    });
-
-    // Heart rate
-    if (day.heartRate != null) {
-      sums.hr += day.heartRate;
-      sums.hrCount++;
-    }
+  slice.forEach(d => {
+    const x = dailyLogs[d];
+    totals.walk += x.walk ?? 0;
+    totals.strength += x.strength ?? 0;
+    totals.treadmill += x.treadmill ?? 0;
+    totals.calories += x.calories ?? 0;
+    totals.hr += x.hr ?? 0;
+    totals.bpSys += x.bp?.sys ?? 0;
+    totals.bpDia += x.bp?.dia ?? 0;
+    totals.count++;
   });
 
   return {
-    bpSys: sums.bpCount ? (sums.sys / sums.bpCount).toFixed(1) : "—",
-    bpDia: sums.bpCount ? (sums.dia / sums.bpCount).toFixed(1) : "—",
-    walk: sums.walk,
-    treadmill: sums.treadmill.toFixed(2),
-    strength: sums.strength,
-    calories: sums.calories,
-    hr: sums.hrCount ? Math.round(sums.hr / sums.hrCount) : "—"
+    walk: totals.walk,
+    strength: totals.strength,
+    treadmill: totals.treadmill,
+    calories: totals.calories,
+    hr: Math.round(totals.hr / totals.count),
+    bpSys: Math.round(totals.bpSys / totals.count),
+    bpDia: Math.round(totals.bpDia / totals.count)
   };
 }
-document
-  .querySelectorAll('input[name="rollingDays"]')
-  .forEach(radio => {
-    radio.addEventListener("change", () => {
-      render(datePicker.value);
-    });
-  });
+
+// =======================
+// Render (Display)
+// =======================
+
+function render(date) {
+  const out = document.getElementById("output");
+
+  if (!dailyLogs[date]) {
+    out.innerHTML = `<h3>${date}</h3><div>No data logged</div>`;
+    return;
+  }
+
+  const d = dailyLogs[date];
+  const days = getRollingDays();
+  const r = getRolling(date, days);
+
+  out.innerHTML = `
+    <h3>${date}</h3>
+
+    <h4>Daily</h4>
+    <div>Walk: ${d.walk} min</div>
+    <div>Strength: ${d.strength} min</div>
+    <div>Treadmill: ${d.treadmill} min</div>
+    <div>Calories: ${d.calories}</div>
+    <div>BP: ${d.bp.sys}/${d.bp.dia}</div>
+    <div>HR: ${d.hr}</div>
+
+    <h4>${days}-Day Rolling</h4>
+    <div>Walk: ${r.walk} min</div>
+    <div>Strength: ${r.strength} min</div>
+    <div>Treadmill: ${r.treadmill} min</div>
+    <div>Calories: ${r.calories}</div>
+    <div>BP: ${r.bpSys}/${r.bpDia}</div>
+    <div>Avg HR: ${r.hr}</div>
+  `;
+}
+
+// =======================
+// Hook Date Picker
+// =======================
+
+document.getElementById("datePicker").addEventListener("change", e => {
+  render(e.target.value);
+});
