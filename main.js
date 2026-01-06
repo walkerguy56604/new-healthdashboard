@@ -1,62 +1,31 @@
 // =======================
-// Daily Logs (Embedded)
+// Config
 // =======================
-const dailyLogs = {
-  "2026-01-02": {
-    "walk": 0,
-    "strength": 29,
-    "treadmill": 20,
-    "calories": 22,
-    "heartRate": 92,
-    "bloodPressure": [
-      { "systolic": 127, "diastolic": 57, "heartRate": 91, "note": "Post AM strength" },
-      { "systolic": 128, "diastolic": 72, "heartRate": 97, "note": "Post treadmill" },
-      { "systolic": 136, "diastolic": 67, "heartRate": 93, "note": "Post PM strength" },
-      { "systolic": 116, "diastolic": 64, "heartRate": 92, "note": "Post PM treadmill" }
-    ],
-    "notes": []
-  },
-  "2026-01-03": {
-    "walk": 5,
-    "strength": 0,
-    "treadmill": 0,
-    "calories": 0,
-    "heartRate": null,
-    "bloodPressure": [],
-    "notes": [
-      "Morning 5-minute walk, non-Siri"
-    ]
-  },
-  "2026-01-04": {
-    "walk": 35,
-    "strength": 30,
-    "treadmill": 10,
-    "calories": 12,
-    "heartRate": 102,
-    "bloodPressure": [
-      { "systolic": 132, "diastolic": 80, "heartRate": 66, "note": "Post strength training" }
-    ],
-    "notes": [
-      "Morning Siri walk",
-      "Afternoon treadmill"
-    ]
-  },
-  "2026-01-05": {
-    "walk": 10,
-    "strength": 18,
-    "treadmill": 10,
-    "calories": 160,
-    "heartRate": 85,
-    "bloodPressure": [
-      { "systolic": 139, "diastolic": 70, "heartRate": 84, "note": "Post strength" },
-      { "systolic": 131, "diastolic": 67, "heartRate": 85, "note": "Post treadmill" }
-    ],
-    "notes": [
-      "Morning Siri walk",
-      "Morning non-Siri walk"
-    ]
+
+// If you're testing locally, keep the relative path:
+const DATA_URL = "./dailylogs.json";
+
+// If hosted remotely (GitHub raw), it could be like:
+// const DATA_URL = "https://raw.githubusercontent.com/yourusername/yourrepo/main/dailylogs.json";
+
+let dailyLogs = {};
+
+// =======================
+// Load JSON Data
+// =======================
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL);
+    if (!res.ok) throw new Error(`Failed to load JSON: ${res.status}`);
+    dailyLogs = await res.json();
+
+    populateDatePicker();
+  } catch (err) {
+    console.error(err);
+    const out = document.getElementById("dailySummaryOutput");
+    out.innerHTML = "<p style='color:red'>Error loading data</p>";
   }
-};
+}
 
 // =======================
 // Populate Date Picker
@@ -88,7 +57,7 @@ function render(date) {
   const d = dailyLogs[date];
 
   if (!d) {
-    out.innerHTML = "<p>No data</p>";
+    out.innerHTML = "<p>No data for this date</p>";
     return;
   }
 
@@ -120,13 +89,12 @@ function render(date) {
 }
 
 // =======================
-// Event Listeners
+// Event Listener
 // =======================
-document
-  .getElementById("datePicker")
+document.getElementById("datePicker")
   .addEventListener("change", e => render(e.target.value));
 
 // =======================
 // Initialize
 // =======================
-populateDatePicker();
+loadData();
