@@ -1,64 +1,128 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Ensure dailyLogs exists
-  if (!window.dailyLogs) {
-    alert("dailyLogs not found! Make sure dailyLogs.js is loaded first.");
+// Main JS for Health Dashboard
+(async function() {
+  const dailyLogsUrl = `dailyLogs.json?v=${Date.now()}`; // Cache-busting
+
+  let dailyLogs = {};
+  try {
+    const res = await fetch(dailyLogsUrl);
+    dailyLogs = await res.json();
+  } catch (err) {
+    console.error("Failed to load dailyLogs.json:", err);
     return;
   }
 
-  const dates = Object.keys(dailyLogs).sort();
-  const metrics = [
-    "walk", "strength", "treadmill", "calories",
-    "heartRate", "weight", "glucose", "HRV", "sleep", "mood"
-  ];
-  const colors = ["green","red","orange","lime","blue","purple","brown","pink","cyan","magenta"];
-
-  const datasets = metrics.map((metric,i) => ({
-    label: metric,
-    data: dates.map(d => dailyLogs[d][metric] ?? 0),
-    borderColor: colors[i],
-    backgroundColor: colors[i],
-    fill: false,
-    tension: 0.3,
-    pointRadius: 5,
-    pointHoverRadius: 7
-  }));
-
+  const dateSelect = document.getElementById("dateSelect");
+  const metricsCard = document.getElementById("metricsCard");
   const ctx = document.getElementById("healthChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: { labels: dates, datasets },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const metric = context.dataset.label;
-              const value = context.parsed.y;
-              const index = context.dataIndex;
-              let trendArrow = "→";
-              if (index > 0) {
-                const prevValue = dailyLogs[dates[index-1]][metric] ?? 0;
-                if (value > prevValue) trendArrow = "↑";
-                else if (value < prevValue) trendArrow = "↓";
-              }
-              return `${metric}: ${value} ${trendArrow}`;
-            }
-          }
-        }
-      },
-      scales: { y: { beginAtZero: true } }
-    }
+
+  // Populate dates in dropdown
+  const dates = Object.keys(dailyLogs).sort((a,b)=> new Date(b) - new Date(a));
+  dates.forEach(date => {
+    const option = document.createElement("option");
+    option.value = date;
+    option.textContent = date;
+    dateSelect.appendChild(option);
   });
 
-  // Metrics summary below chart
-  const metricsSummary = document.getElementById("metricsSummary");
-  dates.forEach(date => {
-    const container = document.createElement("div");
-    container.classList.add("metric");
-    container.innerHTML = `<strong>${date}</strong><br>` +
-      metrics.map(m => `${m}: ${dailyLogs[date][m] ?? 0}`).join("<br>");
-    metricsSummary.appendChild(container);
+  function renderMetrics(date) {
+    const day = dailyLogs[date];
+    metricsCard.innerHTML = ""; // Clear previous
+
+    const metrics = [
+      { key: "walk", label: "Walk", color: "green" },
+      { key: "strength", label: "Strength", color: "red" },
+      { key: "treadmill", label: "Treadmill", color: "green" },
+      { key: "calories", label: "Calories", color: "green" },
+      { key: "heartRate", label: "Heart Rate", color: "blue" },
+      { key: "weight", label: "Weight", color: "blue" },
+      { key: "glucose", label: "Glucose", color: "blue" },
+      { key: "sleep", label: "Sleep", color: "blue" },
+      { key: "HRV", label: "HRV", color: "blue" },
+      { key: "mood", label: "Mood", color: "blue" }
+    ];
+
+    metrics.forEach(m => {
+      if(day[m.key] !== undefined && day[m.key] !== null) {
+        const div = document.createElement("div");
+        div.classList.add("metric", m.color);
+        div.innerHTML = `<span>${m.label}:</span> ${day[m.key]}`;
+        metricsCard.appendChild(div);
+      }
+    });
+
+    // Blood pressure
+    if(day.bloodPressure && day.bloodPressure.length) {
+      day.bloodPressure.forEach(bp => {
+        const div = document.createElement("div");
+        div.classList.add("metric", "blue");
+        div.textContent = `BP: ${bp.systolic}/${bp.diastolic} HR:${bp.heartRate} (${bp.note || ""})`;
+        metricsCard.appendChild(div);
+      });
+    }
+
+    // Notes
+    if(day.notes && day.notes.length) {
+      day.notes.forEach(note => {
+        const div = document.createElement("div");
+        div.classList.add("metric");
+        div.textContent = `Note: ${note}`;
+        metricsCard.appendChild(div);
+      });
+    }
+  }
+
+  function renderChart(date) {
+    const day = dailyLogs[date];
+
+    const labels = ["Walk", "Strength", "Treadmill", "Calories", "Heart Rate", "Weight", "Glucose", "Sleep", "HRV"];
+    const data = [
+      day.walk || 0,
+      day.strength || 0,
+      day.treadmill || 0,
+      day.calories || 0,
+      day.heartRate || 0,
+      day.weight || 0,
+      day.glucose || 0,
+      day.sleep || 0,
+      day.HRV || 0
+    ];
+
+    if(window.healthChartInstance) window.healthChartInstance.destroy();
+
+    window.healthChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: `Metrics for ${date}`,
+          data,
+          backgroundColor: labels.map(l => {
+            if(l === "Walk" || l === "Treadmill" || l === "Calories") return "green";
+            if(l === "Strength") return "red";
+            return "blue";
+          })
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // Initialize
+  const defaultDate = dates[0];
+  renderMetrics(defaultDate);
+  renderChart(defaultDate);
+
+  dateSelect.value = defaultDate;
+  dateSelect.addEventListener("change", e => {
+    renderMetrics(e.target.value);
+    renderChart(e.target.value);
   });
-});
+})();
