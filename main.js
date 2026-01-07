@@ -1,24 +1,47 @@
 // =======================
-// Main.js for Health Dashboard
+// Daily Logs
 // =======================
-
-// Load dailyLogs.json dynamically
-async function loadDailyLogs() {
-  try {
-    const response = await fetch('dailyLogs.json');
-    const logs = await response.json();
-    return logs;
-  } catch (err) {
-    console.error("Failed to load dailyLogs.json", err);
-    return {};
+const dailyLogs = {
+  "2026-01-02": {
+    walk: 0, strength: 29, treadmill: 20, calories: 22, heartRate: 92,
+    weight: 180, glucose: 95, HRV: 50, mood: 3,
+    bloodPressure: [
+      { systolic: 127, diastolic: 57, heartRate: 91, note: "Post AM strength" },
+      { systolic: 128, diastolic: 72, heartRate: 97, note: "Post treadmill" },
+      { systolic: 136, diastolic: 67, heartRate: 93, note: "Post PM strength" },
+      { systolic: 116, diastolic: 64, heartRate: 92, note: "Post PM treadmill" }
+    ],
+    notes: []
+  },
+  "2026-01-03": {
+    walk: 5, strength: 0, treadmill: 0, calories: 0, heartRate: null,
+    weight: 181, glucose: 98, HRV: 48, mood: 4,
+    bloodPressure: [], notes: ["Morning 5-minute walk, non-Siri"]
+  },
+  "2026-01-04": {
+    walk: 35, strength: 30, treadmill: 10, calories: 12, heartRate: 102,
+    weight: 179, glucose: 96, HRV: 52, mood: 4,
+    bloodPressure: [{ systolic: 132, diastolic: 80, heartRate: 66, note: "Post strength training" }],
+    notes: ["Morning Siri walk", "Afternoon treadmill"]
+  },
+  "2026-01-05": {
+    walk: 10, strength: 18, treadmill: 10, calories: 160, heartRate: 85,
+    weight: 180, glucose: 100, HRV: 50, mood: 3,
+    bloodPressure: [
+      { systolic: 139, diastolic: 70, heartRate: 84, note: "Post strength" },
+      { systolic: 131, diastolic: 67, heartRate: 85, note: "Post treadmill" }
+    ],
+    notes: ["Morning Siri walk", "Morning non-Siri walk"]
   }
-}
+};
 
-// Populate the date picker
-function populateDatePicker(logs) {
+// =======================
+// Populate Date Picker
+// =======================
+function populateDatePicker() {
   const picker = document.getElementById("datePicker");
   picker.innerHTML = "";
-  const dates = Object.keys(logs).sort((a,b)=> new Date(a)-new Date(b));
+  const dates = Object.keys(dailyLogs).sort();
   dates.forEach(date => {
     const opt = document.createElement("option");
     opt.value = date;
@@ -27,15 +50,17 @@ function populateDatePicker(logs) {
   });
   if (dates.length > 0) {
     picker.value = dates[dates.length - 1];
-    renderSummary(logs, picker.value);
-    renderChart(logs, dates);
+    renderSummary(picker.value);
+    updateChart();
   }
 }
 
-// Render daily summary
-function renderSummary(logs, date) {
+// =======================
+// Render Daily Summary
+// =======================
+function renderSummary(date) {
   const out = document.getElementById("dailySummaryOutput");
-  const d = logs[date];
+  const d = dailyLogs[date];
   if (!d) {
     out.innerHTML = "<p>No data</p>";
     return;
@@ -43,73 +68,73 @@ function renderSummary(logs, date) {
 
   out.innerHTML = `
     <h3>${date}</h3>
-    <div><b>Walk:</b> ${d.walk ?? "—"} min</div>
-    <div><b>Strength:</b> ${d.strength ?? "—"} min</div>
-    <div><b>Treadmill:</b> ${d.treadmill ?? "—"} min</div>
-    <div><b>Calories:</b> ${d.calories ?? "—"}</div>
+    <div><b>Walk:</b> ${d.walk} min</div>
+    <div><b>Strength:</b> ${d.strength} min</div>
+    <div><b>Treadmill:</b> ${d.treadmill} min</div>
+    <div><b>Calories:</b> ${d.calories}</div>
     <div><b>Heart Rate:</b> ${d.heartRate ?? "—"}</div>
-    <div><b>Weight:</b> ${d.weight ?? "—"}</div>
-    <div><b>Glucose:</b> ${d.glucose ?? "—"}</div>
+    <div><b>Weight:</b> ${d.weight ?? "—"} lbs</div>
+    <div><b>Glucose:</b> ${d.glucose ?? "—"} mg/dL</div>
+    <div><b>HRV:</b> ${d.HRV ?? "—"}</div>
+    <div><b>Mood:</b> ${d.mood ?? "—"}</div>
 
     <h4>Blood Pressure</h4>
     ${
-      d.bloodPressure?.length
+      d.bloodPressure.length
         ? d.bloodPressure.map(bp => `${bp.systolic}/${bp.diastolic} (HR ${bp.heartRate}) – ${bp.note}`).join("<br>")
         : "No BP readings"
     }
 
     <h4>Notes</h4>
-    ${d.notes?.length ? d.notes.map(n => `• ${n}`).join("<br>") : "No notes"}
+    ${
+      d.notes.length
+        ? d.notes.map(n => `• ${n}`).join("<br>")
+        : "No notes"
+    }
   `;
 }
 
-// Render line chart for trends
-function renderChart(logs, dates) {
-  const ctx = document.getElementById("healthChart").getContext("2d");
+// =======================
+// Chart Setup
+// =======================
+const ctx = document.getElementById("healthChart").getContext("2d");
+let healthChart = new Chart(ctx, {
+  type: "line",
+  data: { labels: [], datasets: [] },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: "bottom" } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
 
-  const walkData = dates.map(d => logs[d].walk ?? 0);
-  const strengthData = dates.map(d => logs[d].strength ?? 0);
-  const treadmillData = dates.map(d => logs[d].treadmill ?? 0);
-  const caloriesData = dates.map(d => logs[d].calories ?? 0);
-  const heartRateData = dates.map(d => logs[d].heartRate ?? null);
-  const weightData = dates.map(d => logs[d].weight ?? null);
-  const glucoseData = dates.map(d => logs[d].glucose ?? null);
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: dates,
-      datasets: [
-        { label: 'Walk', data: walkData, borderColor: 'green', fill: false, tension: 0.2 },
-        { label: 'Strength', data: strengthData, borderColor: 'red', fill: false, tension: 0.2 },
-        { label: 'Treadmill', data: treadmillData, borderColor: 'orange', fill: false, tension: 0.2 },
-        { label: 'Calories', data: caloriesData, borderColor: 'blue', fill: false, tension: 0.2 },
-        { label: 'Heart Rate', data: heartRateData, borderColor: 'purple', fill: false, tension: 0.2 },
-        { label: 'Weight', data: weightData, borderColor: 'brown', fill: false, tension: 0.2 },
-        { label: 'Glucose', data: glucoseData, borderColor: 'pink', fill: false, tension: 0.2 },
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'top' } },
-      scales: { y: { beginAtZero: true } }
-    }
-  });
+function updateChart() {
+  const dates = Object.keys(dailyLogs).sort();
+  const metrics = ["walk","strength","treadmill","calories","heartRate","weight","glucose","HRV","mood"];
+  const colors = ["green","red","orange","lime","blue","purple","brown","pink","cyan"];
+  const datasets = metrics.map((metric,i) => ({
+    label: metric,
+    data: dates.map(d => dailyLogs[d][metric] ?? 0),
+    borderColor: colors[i],
+    backgroundColor: colors[i],
+    tension: 0.3,
+    fill: false
+  }));
+  
+  healthChart.data.labels = dates;
+  healthChart.data.datasets = datasets;
+  healthChart.update();
 }
 
 // =======================
-// Init
+// Event Listener
 // =======================
-async function initDashboard() {
-  const logs = await loadDailyLogs();
-  if (!logs || Object.keys(logs).length === 0) return;
+document.getElementById("datePicker").addEventListener("change", e => {
+  renderSummary(e.target.value);
+  updateChart();
+});
 
-  populateDatePicker(logs);
-
-  document.getElementById("datePicker").addEventListener("change", e => {
-    renderSummary(logs, e.target.value);
-  });
-}
-
-// Run dashboard
-initDashboard();
+// =======================
+// Initialize
+// =======================
+populateDatePicker();
