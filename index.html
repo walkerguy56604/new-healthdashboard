@@ -4,26 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Health Dashboard</title>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
     h1 { text-align: center; }
-    #dashboard { max-width: 1200px; margin: auto; }
-    canvas { background-color: #f9f9f9; border: 1px solid #ccc; }
-    .metrics { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 15px; }
-    .metric { padding: 10px; border-radius: 5px; min-width: 120px; text-align: center; font-weight: bold; }
+    .dashboard { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1000px; margin: 0 auto; }
+    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    canvas { max-width: 100%; }
+    .metric { margin: 5px 0; }
+    .metric span { font-weight: bold; }
+    .green { color: green; }
+    .red { color: red; }
+    .blue { color: blue; }
   </style>
 </head>
 <body>
   <h1>Health Dashboard</h1>
-  <div id="dashboard">
-    <canvas id="healthChart" width="1000" height="400"></canvas>
-    <div class="metrics" id="metricsSummary"></div>
+  <div class="dashboard">
+    <div class="card">
+      <label for="dateSelect">Select Date:</label>
+      <select id="dateSelect"></select>
+    </div>
+
+    <div class="card" id="metricsCard">
+      <!-- Metrics will be dynamically inserted here -->
+    </div>
+
+    <div class="card">
+      <canvas id="healthChart"></canvas>
+    </div>
   </div>
 
-  <script src="dailyLogs.js"></script>
-  <script src="main.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main JS with cache-busting -->
+  <script src="main.js?v=1.0"></script>
 </body>
 </html>
