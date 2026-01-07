@@ -1,77 +1,64 @@
-let dailyLogs = {};
-let chart;
+async function loadDailyLogs() {
+  try {
+    const res = await fetch("dailyLogs.json");
+    const data = await res.json();
 
-fetch("dailyLogs.json?v=" + Date.now())
-  .then(res => res.json())
-  .then(data => {
-    dailyLogs = data;
-    populateDates();
-    loadDay(Object.keys(dailyLogs)[0]);
-  })
-  .catch(err => {
-    console.error("Failed to load dailyLogs.json", err);
-  });
+    const dateSelect = document.getElementById("dateSelect");
+    dateSelect.innerHTML = "";
 
-function populateDates() {
-  const select = document.getElementById("dateSelect");
-  select.innerHTML = "";
+    Object.keys(data).sort().reverse().forEach(date => {
+      const option = document.createElement("option");
+      option.value = date;
+      option.textContent = date;
+      dateSelect.appendChild(option);
+    });
 
-  Object.keys(dailyLogs).forEach(date => {
-    const option = document.createElement("option");
-    option.value = date;
-    option.textContent = date;
-    select.appendChild(option);
-  });
+    dateSelect.addEventListener("change", () => {
+      renderDay(data[dateSelect.value]);
+    });
 
-  select.addEventListener("change", e => loadDay(e.target.value));
+    renderDay(data[dateSelect.value]);
+  } catch (err) {
+    console.error("Failed to load daily logs", err);
+  }
 }
 
-function loadDay(date) {
-  const log = dailyLogs[date];
-  if (!log) return;
+function renderDay(log) {
+  setText("walk", log.walk);
+  setText("strength", log.strength);
+  setText("treadmill", log.treadmill);
+  setText("calories", log.calories);
+  setText("weight", log.weight);
+  setText("glucose", log.glucose);
+  setText("sleep", log.sleep);
+  setText("hrv", log.hrv);
+  setText("mood", log.mood);
 
-  document.getElementById("calories").textContent = log.calories ?? "—";
-  document.getElementById("walk").textContent = log.walk ?? "—";
-  document.getElementById("strength").textContent = log.strength ?? "—";
-  document.getElementById("treadmill").textContent = log.treadmill ?? "—";
-  document.getElementById("notes").textContent = log.notes ?? "—";
+  renderBloodPressure(log.bloodPressure);
+}
 
-  // Blood pressure (array-safe)
-  if (Array.isArray(log.bloodPressure)) {
-    document.getElementById("bp").textContent =
-      log.bloodPressure
-        .map(bp => `${bp.sys}/${bp.dia} (HR ${bp.hr})`)
-        .join(" • ");
-  } else {
-    document.getElementById("bp").textContent = "—";
+function setText(id, value) {
+  document.getElementById(id).textContent =
+    value !== undefined && value !== null ? value : "—";
+}
+
+function renderBloodPressure(bpArray) {
+  const el = document.getElementById("bp");
+
+  if (!Array.isArray(bpArray) || bpArray.length === 0) {
+    el.textContent = "—";
+    return;
   }
 
-  drawChart(log);
+  el.textContent = bpArray.map(bp => {
+    const sys = bp.systolic ?? bp.sys ?? "—";
+    const dia = bp.diastolic ?? bp.dia ?? "—";
+    const hr  = bp.pulse ?? bp.hr ?? bp.heartRate ?? "";
+
+    return hr
+      ? `${sys}/${dia} (HR ${hr})`
+      : `${sys}/${dia}`;
+  }).join(" • ");
 }
 
-function drawChart(log) {
-  const ctx = document.getElementById("activityChart");
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Walk", "Strength", "Treadmill"],
-      datasets: [{
-        label: "Activity",
-        data: [
-          log.walk ?? 0,
-          log.strength ?? 0,
-          log.treadmill ?? 0
-        ]
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-}
+loadDailyLogs();
