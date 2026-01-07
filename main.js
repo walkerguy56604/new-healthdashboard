@@ -4,12 +4,14 @@
 const DATA_URL = "./dailyLogs.json";
 let dailyLogs = {};
 
-// Thresholds for color coding
 const thresholds = {
-  bloodPressure: { systolic: 130, diastolic: 80 },  // above is high
+  bloodPressure: { systolic: 130, diastolic: 80 },
   heartRate: { min: 60, max: 100 },
   glucose: { min: 70, max: 140 },
-  mood: ["😞", "😐", "🙂", "😃"] // optional emoji representation
+  weight: { min: 60, max: 80 },    // kg
+  sleep: { min: 6, max: 8 },       // hours
+  HRV: { min: 50, max: 100 },      // arbitrary units
+  mood: ["😞", "😐", "🙂", "😃"]
 };
 
 // =======================
@@ -32,27 +34,21 @@ async function loadData() {
 function populateDatePicker() {
   const picker = document.getElementById("datePicker");
   picker.innerHTML = "";
-
   const dates = Object.keys(dailyLogs).sort();
-
   dates.forEach(date => {
     const opt = document.createElement("option");
     opt.value = date;
     opt.textContent = date;
     picker.appendChild(opt);
   });
-
-  if (dates.length > 0) {
-    picker.value = dates[dates.length - 1];
-    render(dates[dates.length - 1]);
-  }
+  if (dates.length > 0) render(dates[dates.length - 1]);
 }
 
 // =======================
-// Helper for color coding
+// Color coding helper
 // =======================
 function colorValue(metric, value) {
-  if (value === null || value === undefined) return value ?? "—";
+  if (value === null || value === undefined) return "—";
 
   switch(metric) {
     case "heartRate":
@@ -65,11 +61,23 @@ function colorValue(metric, value) {
       return `<span style="color:green">${value}</span>`;
     case "bloodPressure":
       const { systolic, diastolic } = value;
-      if (systolic > thresholds.bloodPressure.systolic || diastolic > thresholds.bloodPressure.diastolic) 
+      if (systolic > thresholds.bloodPressure.systolic || diastolic > thresholds.bloodPressure.diastolic)
         return `<span style="color:red">${systolic}/${diastolic}</span>`;
       return `<span style="color:green">${systolic}/${diastolic}</span>`;
+    case "weight":
+      if (value < thresholds.weight.min) return `<span style="color:blue">${value}</span>`;
+      if (value > thresholds.weight.max) return `<span style="color:red">${value}</span>`;
+      return `<span style="color:green">${value}</span>`;
+    case "sleep":
+      if (value < thresholds.sleep.min) return `<span style="color:red">${value}</span>`;
+      if (value > thresholds.sleep.max) return `<span style="color:blue">${value}</span>`;
+      return `<span style="color:green">${value}</span>`;
+    case "HRV":
+      if (value < thresholds.HRV.min) return `<span style="color:red">${value}</span>`;
+      if (value > thresholds.HRV.max) return `<span style="color:blue">${value}</span>`;
+      return `<span style="color:green">${value}</span>`;
     case "mood":
-      return `<span>${value}</span>`; // optional: could use emoji color
+      return `<span>${value ?? "—"}</span>`;
     default:
       return value;
   }
@@ -81,7 +89,6 @@ function colorValue(metric, value) {
 function render(date) {
   const out = document.getElementById("dailySummaryOutput");
   const d = dailyLogs[date];
-
   if (!d) {
     out.innerHTML = "<p>No data</p>";
     return;
@@ -89,24 +96,21 @@ function render(date) {
 
   out.innerHTML = `
     <h3>${date}</h3>
-
-    <div><b>Walk:</b> ${d.walk} min</div>
-    <div><b>Strength:</b> ${d.strength} min</div>
-    <div><b>Treadmill:</b> ${d.treadmill} min</div>
-    <div><b>Calories:</b> ${d.calories}</div>
+    <div><b>Walk:</b> ${d.walk ?? "—"} min</div>
+    <div><b>Strength:</b> ${d.strength ?? "—"} min</div>
+    <div><b>Treadmill:</b> ${d.treadmill ?? "—"} min</div>
+    <div><b>Calories:</b> ${d.calories ?? "—"}</div>
     <div><b>Heart Rate:</b> ${colorValue("heartRate", d.heartRate)}</div>
-    <div><b>Weight:</b> ${d.weight ?? "—"} kg</div>
+    <div><b>Weight:</b> ${colorValue("weight", d.weight)}</div>
     <div><b>Glucose:</b> ${colorValue("glucose", d.glucose)}</div>
-    <div><b>Sleep:</b> ${d.sleep ?? "—"} hrs</div>
-    <div><b>HRV:</b> ${d.HRV ?? "—"}</div>
+    <div><b>Sleep:</b> ${colorValue("sleep", d.sleep)}</div>
+    <div><b>HRV:</b> ${colorValue("HRV", d.HRV)}</div>
     <div><b>Mood:</b> ${colorValue("mood", d.mood)}</div>
 
     <h4>Blood Pressure</h4>
     ${
       d.bloodPressure.length
-        ? d.bloodPressure
-            .map(bp => `${colorValue("bloodPressure", bp)} (HR ${bp.heartRate}) – ${bp.note}`)
-            .join("<br>")
+        ? d.bloodPressure.map(bp => `${colorValue("bloodPressure", bp)} (HR ${bp.heartRate}) – ${bp.note}`).join("<br>")
         : "No BP readings"
     }
 
