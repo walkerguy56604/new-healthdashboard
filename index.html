@@ -2,28 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Health Dashboard</title>
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #metricsContainer div { margin: 4px 0; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f0f0f0;
+    }
+    h1 { text-align: center; }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .metric {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .metric span { font-weight: bold; }
+    .arrows { font-size: 14px; margin-left: 5px; }
+    #chartContainer { width: 100%; max-width: 900px; margin: auto; }
   </style>
 </head>
 <body>
   <h1>Health Dashboard</h1>
-
-  <label for="dateSelect">Select Date:</label>
-  <select id="dateSelect"></select>
-
-  <h2>Metrics</h2>
-  <div id="metricsContainer"></div>
-
-  <h2>Single Day Chart</h2>
-  <canvas id="barChart" width="400" height="200"></canvas>
-
-  <h2>Trend Over Time (Last 7 Days)</h2>
-  <canvas id="lineChart" width="400" height="200"></canvas>
-
+  <div>
+    <label for="selectDate">Select Date:</label>
+    <input type="date" id="selectDate">
+  </div>
+  <div class="dashboard">
+    <div class="metric" id="walk">Walk: <span>0</span></div>
+    <div class="metric" id="strength">Strength: <span>0</span></div>
+    <div class="metric" id="treadmill">Treadmill: <span>0</span></div>
+    <div class="metric" id="calories">Calories: <span>0</span></div>
+    <div class="metric" id="heartRate">Heart Rate: <span>0</span></div>
+    <div class="metric" id="weight">Weight: <span>0</span></div>
+    <div class="metric" id="glucose">Glucose: <span>0</span></div>
+    <div class="metric" id="sleep">Sleep: <span>0</span></div>
+    <div class="metric" id="HRV">HRV: <span>0</span></div>
+    <div class="metric" id="mood">Mood: <span>0</span></div>
+    <div class="metric" id="bloodPressure">Blood Pressure: <span>0/0</span></div>
+    <div class="metric" id="notes">Notes: <span>None</span></div>
+  </div>
+  <div id="chartContainer">
+    <canvas id="healthChart"></canvas>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>
