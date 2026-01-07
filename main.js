@@ -1,76 +1,82 @@
-// main.js
-
-// Load daily logs
+// Load dailyLogs
 async function loadDailyLogs() {
-  const response = await fetch('dailyLogs.json');
-  const logs = await response.json();
-  return logs;
+  try {
+    const res = await fetch('dailyLogs.json');
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.error("Failed to load daily logs", e);
+    return {};
+  }
 }
 
-// Function to generate trend arrow
-function trendArrow(value, previous) {
-  if (previous === null || previous === undefined) return '';
-  if (value > previous) return '↑';
-  if (value < previous) return '↓';
-  return '→';
+// Populate date selector
+function populateDates(logs) {
+  const select = document.getElementById('dateSelect');
+  select.innerHTML = '';
+  Object.keys(logs).forEach(date => {
+    const option = document.createElement('option');
+    option.value = date;
+    option.textContent = date;
+    select.appendChild(option);
+  });
+  if (select.options.length > 0) updateDashboard(logs, select.value);
+  select.addEventListener('change', () => updateDashboard(logs, select.value));
 }
 
-// Function to render daily metrics
-function renderDailyMetrics(logs) {
-  const container = document.getElementById('dashboard');
-  container.innerHTML = '';
+// Update dashboard stats
+function updateDashboard(logs, date) {
+  const day = logs[date];
+  if (!day) return;
 
-  const dates = Object.keys(logs).sort();
-  let prev = {};
+  document.getElementById('walk').textContent = `Walk: ${day.walk}`;
+  document.getElementById('strength').textContent = `Strength: ${day.strength}`;
+  document.getElementById('treadmill').textContent = `Treadmill: ${day.treadmill}`;
+  document.getElementById('calories').textContent = `Calories: ${day.calories}`;
+  document.getElementById('heartRate').textContent = `Heart Rate: ${day.heartRate || 'N/A'}`;
+  
+  const bpText = day.bloodPressure.map(bp => `${bp.systolic}/${bp.diastolic} (HR ${bp.heartRate}) • ${bp.note}`).join(' • ');
+  document.getElementById('bloodPressure').textContent = `Blood Pressure: ${bpText || 'N/A'}`;
 
-  dates.forEach(date => {
-    const day = logs[date];
-    const div = document.createElement('div');
-    div.className = 'daily-entry';
-    
-    const walkArrow = trendArrow(day.walk, prev.walk);
-    const strengthArrow = trendArrow(day.strength, prev.strength);
-    const treadmillArrow = trendArrow(day.treadmill, prev.treadmill);
-    const caloriesArrow = trendArrow(day.calories, prev.calories);
-    const hrArrow = trendArrow(day.heartRate, prev.heartRate);
+  document.getElementById('weight').textContent = `Weight: ${day.weight || 'N/A'}`;
+  document.getElementById('glucose').textContent = `Glucose: ${day.glucose || 'N/A'}`;
+  document.getElementById('sleep').textContent = `Sleep: ${day.sleep || 'N/A'}`;
+  document.getElementById('HRV').textContent = `HRV: ${day.HRV || 'N/A'}`;
+  document.getElementById('mood').textContent = `Mood: ${day.mood || 'N/A'}`;
 
-    div.innerHTML = `
-      <h3>${date}</h3>
-      <p><span style="color:green;">Walk: ${day.walk} ${walkArrow}</span></p>
-      <p><span style="color:red;">Strength: ${day.strength} ${strengthArrow}</span></p>
-      <p><span style="color:blue;">Treadmill: ${day.treadmill} ${treadmillArrow}</span></p>
-      <p><span style="color:orange;">Calories: ${day.calories} ${caloriesArrow}</span></p>
-      <p><span style="color:purple;">Heart Rate: ${day.heartRate || '—'} ${hrArrow}</span></p>
-      <p><span style="color:blue;">Blood Pressure: ${
-        day.bloodPressure.length > 0
-          ? day.bloodPressure.map(bp => `${bp.systolic}/${bp.diastolic} (HR ${bp.heartRate}) • ${bp.note}`).join(' • ')
-          : 'No readings'
-      }</span></p>
-      <p>Weight: ${day.weight || '—'}</p>
-      <p>Glucose: ${day.glucose || '—'}</p>
-      <p>Sleep: ${day.sleep || '—'}</p>
-      <p>HRV: ${day.HRV || '—'}</p>
-      <p>Mood: ${day.mood || '—'}</p>
-      <hr/>
-    `;
+  updateChart(day);
+}
 
-    container.appendChild(div);
+// Basic bar chart
+let chartInstance = null;
+function updateChart(day) {
+  const ctx = document.getElementById('healthChart').getContext('2d');
+  const labels = ['Walk', 'Strength', 'Treadmill', 'Calories'];
+  const values = [day.walk, day.strength, day.treadmill, day.calories];
 
-    // Save current metrics for trend comparison
-    prev = {
-      walk: day.walk,
-      strength: day.strength,
-      treadmill: day.treadmill,
-      calories: day.calories,
-      heartRate: day.heartRate
-    };
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Activity Metrics',
+        data: values,
+        backgroundColor: ['#4caf50','#f44336','#2196f3','#ff9800']
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
   });
 }
 
-// Initialize dashboard
-async function initDashboard() {
+// Initialize
+(async () => {
   const logs = await loadDailyLogs();
-  renderDailyMetrics(logs);
-}
-
-initDashboard();
+  populateDates(logs);
+})();
