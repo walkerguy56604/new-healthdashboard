@@ -1,144 +1,115 @@
-// Load JSON data dynamically
-async function loadDailyLogs() {
-  const res = await fetch('dailyLogs.json');
-  const data = await res.json();
-  return data;
-}
+// main.js
+document.addEventListener("DOMContentLoaded", async () => {
+  const dateSelect = document.getElementById("dateSelect");
+  const metricsContainer = document.getElementById("metricsContainer");
 
-// Colors for metrics
-const metricColors = {
-  walk: 'green',
-  strength: 'red',
-  treadmill: 'orange',
-  calories: 'green',
-  heartRate: 'blue',
-  weight: 'purple',
-  glucose: 'brown',
-  sleep: 'teal',
-  HRV: 'magenta',
-  mood: 'gray'
-};
-
-let dailyLogs = {};
-
-async function initDashboard() {
-  dailyLogs = await loadDailyLogs();
+  let dailyLogs = {};
+  try {
+    const response = await fetch("dailyLogs.json");
+    dailyLogs = await response.json();
+  } catch (err) {
+    console.error("Failed to load dailyLogs.json", err);
+    return;
+  }
 
   const dates = Object.keys(dailyLogs).sort();
-  const selectDate = document.getElementById('selectDate');
-
-  // Populate date selector
   dates.forEach(date => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = date;
     option.textContent = date;
-    selectDate.appendChild(option);
+    dateSelect.appendChild(option);
   });
+
+  function renderMetrics(selectedDate) {
+    metricsContainer.innerHTML = "";
+    const today = dailyLogs[selectedDate];
+    const prevDateIndex = dates.indexOf(selectedDate) - 1;
+    const yesterday = prevDateIndex >= 0 ? dailyLogs[dates[prevDateIndex]] : null;
+
+    const metrics = [
+      "walk", "strength", "treadmill", "calories",
+      "heartRate", "weight", "glucose", "sleep", "HRV", "mood"
+    ];
+
+    metrics.forEach(metric => {
+      const todayVal = today[metric] ?? 0;
+      const yesterdayVal = yesterday ? yesterday[metric] ?? 0 : 0;
+      const diff = todayVal - yesterdayVal;
+
+      const arrow = diff > 0 ? "⬆️" : diff < 0 ? "⬇️" : "➡️";
+      const color = diff > 0 ? "green" : diff < 0 ? "red" : "gray";
+
+      const metricDiv = document.createElement("div");
+      metricDiv.style.margin = "4px 0";
+      metricDiv.innerHTML = `<strong>${metric}:</strong> <span style="color:${color}">${todayVal} ${arrow}</span>`;
+      metricDiv.title = `Yesterday: ${yesterdayVal} | Change: ${diff}`;
+      metricsContainer.appendChild(metricDiv);
+    });
+  }
+
+  dateSelect.addEventListener("change", () => {
+    renderMetrics(dateSelect.value);
+    renderCharts(dateSelect.value);
+  });
+
+  function renderCharts(selectedDate) {
+    const ctxBar = document.getElementById("barChart").getContext("2d");
+    const ctxLine = document.getElementById("lineChart").getContext("2d");
+
+    const metricLabels = ["walk","strength","treadmill","calories","heartRate","weight","glucose","sleep","HRV","mood"];
+    const barData = metricLabels.map(m => dailyLogs[selectedDate][m] ?? 0);
+
+    // Destroy old charts if exist
+    if(window.barChartInstance) window.barChartInstance.destroy();
+    if(window.lineChartInstance) window.lineChartInstance.destroy();
+
+    // Bar Chart
+    window.barChartInstance = new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: metricLabels,
+        datasets: [{
+          label: selectedDate,
+          data: barData,
+          backgroundColor: metricLabels.map((_,i) => i < 4 ? "green" : "blue"),
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        }
+      }
+    });
+
+    // Line Chart - trends for past days
+    const pastDays = dates.slice(-7); // last 7 days
+    const datasets = metricLabels.map(metric => ({
+      label: metric,
+      data: pastDays.map(d => dailyLogs[d][metric] ?? 0),
+      borderColor: `hsl(${Math.random()*360},70%,50%)`,
+      fill: false,
+      tension: 0.2
+    }));
+
+    window.lineChartInstance = new Chart(ctxLine, {
+      type: "line",
+      data: {
+        labels: pastDays,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        plugins: { tooltip: { enabled: true } }
+      }
+    });
+  }
 
   // Initial render
-  renderCards(dates[dates.length - 1]);
-  renderCharts(dates);
-}
-
-// Render metric cards with arrows
-function renderCards(selectedDate) {
-  const container = document.getElementById('cards');
-  container.innerHTML = '';
-
-  const dayData = dailyLogs[selectedDate];
-
-  for (const key in dayData) {
-    if (key === 'bloodPressure' || key === 'notes') continue;
-
-    const value = dayData[key];
-    let previousValue = getPreviousValue(selectedDate, key);
-
-    const arrow = previousValue != null ? (value > previousValue ? '↑' : (value < previousValue ? '↓' : '→')) : '';
-    const arrowClass = arrow === '↑' ? 'arrow-up' : arrow === '↓' ? 'arrow-down' : '';
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div>${key}</div>
-      <div class="metric" style="color:${metricColors[key] || 'black'}">
-        ${value != null ? value : 'N/A'} <span class="${arrowClass}">${arrow}</span>
-      </div>
-    `;
-    container.appendChild(card);
+  if(dates.length) {
+    dateSelect.value = dates[dates.length - 1];
+    renderMetrics(dateSelect.value);
+    renderCharts(dateSelect.value);
   }
-}
-
-// Helper to get previous day's value
-function getPreviousValue(date, key) {
-  const dates = Object.keys(dailyLogs).sort();
-  const idx = dates.indexOf(date);
-  if (idx > 0) {
-    const prevData = dailyLogs[dates[idx - 1]];
-    return prevData[key] != null ? prevData[key] : null;
-  }
-  return null;
-}
-
-// Render charts
-function renderCharts(dates) {
-  const trendCtx = document.getElementById('trendChart').getContext('2d');
-  const barCtx = document.getElementById('barChart').getContext('2d');
-
-  // Metrics for charts
-  const chartMetrics = Object.keys(metricColors);
-
-  // Line chart datasets
-  const lineDatasets = chartMetrics.map(metric => ({
-    label: metric,
-    data: dates.map(date => dailyLogs[date][metric] != null ? dailyLogs[date][metric] : null),
-    borderColor: metricColors[metric],
-    backgroundColor: 'transparent',
-    tension: 0.3
-  }));
-
-  // Destroy previous charts if they exist
-  if (window.trendChartInstance) window.trendChartInstance.destroy();
-  if (window.barChartInstance) window.barChartInstance.destroy();
-
-  // Trend line chart
-  window.trendChartInstance = new Chart(trendCtx, {
-    type: 'line',
-    data: {
-      labels: dates,
-      datasets: lineDatasets
-    },
-    options: {
-      responsive: true,
-      plugins: { tooltip: { mode: 'index', intersect: false } },
-      interaction: { mode: 'nearest', intersect: false },
-      scales: { y: { beginAtZero: true } }
-    }
-  });
-
-  // Bar chart for selected day
-  const selectedDate = document.getElementById('selectDate').value || dates[dates.length - 1];
-  const dayData = dailyLogs[selectedDate];
-  const barData = chartMetrics.map(metric => dayData[metric] != null ? dayData[metric] : 0);
-
-  window.barChartInstance = new Chart(barCtx, {
-    type: 'bar',
-    data: {
-      labels: chartMetrics,
-      datasets: [{
-        label: selectedDate,
-        data: barData,
-        backgroundColor: chartMetrics.map(metric => metricColors[metric] || 'black')
-      }]
-    },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-
-  // Update cards when date changes
-  document.getElementById('selectDate').addEventListener('change', e => {
-    renderCards(e.target.value);
-    renderCharts(dates);
-  });
-}
-
-// Initialize
-initDashboard();
+});
