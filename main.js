@@ -1,94 +1,81 @@
-// Main JS for Health Dashboard with Arrows
-(async function() {
-  const dailyLogsUrl = `dailyLogs.json?v=${Date.now()}`; // Cache-busting
+let dailyLogs = {};
+let chart;
 
-  let dailyLogs = {};
-  try {
-    const res = await fetch(dailyLogsUrl);
-    dailyLogs = await res.json();
-  } catch (err) {
-    console.error("Failed to load dailyLogs.json:", err);
-    return;
-  }
+async function loadLogs() {
+    try {
+        const response = await fetch('dailyLogs.json');
+        dailyLogs = await response.json();
+        populateDates();
+    } catch (err) {
+        console.error('Error loading dailyLogs.json:', err);
+    }
+}
 
-  const dateSelect = document.getElementById("dateSelect");
-  const metricsCard = document.getElementById("metricsCard");
+function populateDates() {
+    const select = document.getElementById('dateSelect');
+    select.innerHTML = '';
+    Object.keys(dailyLogs).sort().forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        select.appendChild(option);
+    });
+    select.addEventListener('change', () => updateDashboard(select.value));
+    if (select.options.length > 0) updateDashboard(select.value);
+}
 
-  // Sort dates ascending
-  const dates = Object.keys(dailyLogs).sort((a,b)=> new Date(a) - new Date(b));
+function updateDashboard(date) {
+    const metricsDiv = document.getElementById('metricsContainer');
+    metricsDiv.innerHTML = '';
+    const current = dailyLogs[date];
+    const prevDate = Object.keys(dailyLogs).sort().reverse().find(d => d < date);
+    const previous = prevDate ? dailyLogs[prevDate] : null;
 
-  // Populate dropdown
-  dates.forEach(date => {
-    const option = document.createElement("option");
-    option.value = date;
-    option.textContent = date;
-    dateSelect.appendChild(option);
-  });
-
-  function getArrow(current, previous) {
-    if(previous === undefined) return ""; 
-    if(current > previous) return "⬆️"; 
-    if(current < previous) return "⬇️"; 
-    return "➡️";
-  }
-
-  function renderMetrics(date) {
-    const dayIndex = dates.indexOf(date);
-    const prevDay = dates[dayIndex - 1] ? dailyLogs[dates[dayIndex - 1]] : {};
-    const day = dailyLogs[date];
-
-    metricsCard.innerHTML = ""; // Clear previous
-
-    const metrics = [
-      { key: "walk", label: "Walk", color: "green" },
-      { key: "strength", label: "Strength", color: "red" },
-      { key: "treadmill", label: "Treadmill", color: "green" },
-      { key: "calories", label: "Calories", color: "green" },
-      { key: "heartRate", label: "Heart Rate", color: "blue" },
-      { key: "weight", label: "Weight", color: "blue" },
-      { key: "glucose", label: "Glucose", color: "blue" },
-      { key: "sleep", label: "Sleep", color: "blue" },
-      { key: "HRV", label: "HRV", color: "blue" },
-      { key: "mood", label: "Mood", color: "blue" }
-    ];
-
-    metrics.forEach(m => {
-      if(day[m.key] !== undefined && day[m.key] !== null) {
-        const div = document.createElement("div");
-        div.classList.add("metric", m.color);
-        div.innerHTML = `<span>${m.label}:</span> ${day[m.key]} ${getArrow(day[m.key], prevDay[m.key])}`;
-        metricsCard.appendChild(div);
-      }
+    const metrics = ['walk', 'strength', 'treadmill', 'calories', 'heartRate', 'weight', 'glucose', 'sleep', 'HRV', 'mood'];
+    metrics.forEach(metric => {
+        const value = current[metric] ?? 0;
+        let arrow = '';
+        if (previous && previous[metric] !== undefined) {
+            if (value > previous[metric]) arrow = '<span class="arrow-up">↑</span>';
+            else if (value < previous[metric]) arrow = '<span class="arrow-down">↓</span>';
+        }
+        const div = document.createElement('div');
+        div.className = 'metric';
+        div.innerHTML = `${metric}<span class="value">${value} ${arrow}</span>`;
+        metricsDiv.appendChild(div);
     });
 
-    if(day.bloodPressure && day.bloodPressure.length) {
-      day.bloodPressure.forEach((bp, idx) => {
-        const prevBP = prevDay.bloodPressure ? prevDay.bloodPressure[idx] : {};
-        const div = document.createElement("div");
-        div.classList.add("metric", "blue");
-        const systolicArrow = getArrow(bp.systolic, prevBP.systolic);
-        const diastolicArrow = getArrow(bp.diastolic, prevBP.diastolic);
-        div.textContent = `BP: ${bp.systolic}/${bp.diastolic} ${systolicArrow}${diastolicArrow} HR:${bp.heartRate} (${bp.note || ""})`;
-        metricsCard.appendChild(div);
-      });
-    }
+    updateChart(date, current);
+}
 
-    if(day.notes && day.notes.length) {
-      day.notes.forEach(note => {
-        const div = document.createElement("div");
-        div.classList.add("metric");
-        div.textContent = `Note: ${note}`;
-        metricsCard.appendChild(div);
-      });
-    }
-  }
+function updateChart(date, data) {
+    const ctx = document.getElementById('healthChart').getContext('2d');
+    const labels = ['Walk', 'Strength', 'Treadmill', 'Calories', 'Heart Rate', 'Weight', 'Glucose', 'Sleep', 'HRV', 'Mood'];
+    const colors = ['green','red','orange','green','blue','purple','pink','brown','gray','teal'];
+    const values = labels.map(label => data[label.toLowerCase()] ?? 0);
 
-  // Initialize default
-  const defaultDate = dates[dates.length - 1];
-  dateSelect.value = defaultDate;
-  renderMetrics(defaultDate);
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: `Metrics for ${date}`,
+                data: values,
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
 
-  dateSelect.addEventListener("change", e => {
-    renderMetrics(e.target.value);
-  });
-})();
+loadLogs();
